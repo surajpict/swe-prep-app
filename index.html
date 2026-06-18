@@ -5,333 +5,1593 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="SWE Prep">
+<meta name="description" content="Track SWE interview prep — sections, topics, notes, and progress">
 <title>SWE Prep Tracker</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
   :root {
-    --bg: #0f1117; --surface: #1a1d27; --surface2: #222637; --border: #2e3347;
-    --accent: #6c8ef5; --accent2: #a78bfa; --green: #34d399; --yellow: #fbbf24;
-    --red: #f87171; --text: #e2e8f0; --muted: #64748b;
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --surface2: #f8fafc;
+    --border: #e2e8f0;
+    --text: #0f172a;
+    --muted: #64748b;
+    --accent: #2563eb;
+    --green: #16a34a;
+    --green-bg: #f0fdf4;
+    --yellow: #ca8a04;
+    --yellow-bg: #fefce8;
+    --orange: #ea580c;
+    --orange-bg: #fff7ed;
+    --blue-bg: #eff6ff;
+    --purple: #7c3aed;
+    --purple-bg: #f5f3ff;
+    --teal: #0d9488;
+    --teal-bg: #f0fdfa;
+    --pink: #db2777;
+    --pink-bg: #fdf2f8;
+    --danger: #dc2626;
+    --danger-bg: #fef2f2;
+    --focus: #2563eb;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 90px; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 100px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
-  header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 18px 16px 14px; position: sticky; top: 0; z-index: 100; }
-  .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-  .logo { font-family: 'JetBrains Mono', monospace; font-size: 17px; font-weight: 600; color: var(--accent); }
-  .logo span { color: var(--accent2); }
-  .overall-progress { text-align: right; font-size: 11px; color: var(--muted); }
-  .overall-progress strong { display: block; font-size: 22px; font-family: 'JetBrains Mono', monospace; color: var(--green); font-weight: 600; }
-  .progress-bar-wrap { background: var(--border); border-radius: 4px; height: 5px; overflow: hidden; }
-  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 4px; transition: width 0.4s ease; }
+  .ico { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; line-height: 0; }
+  .ico svg { width: 1em; height: 1em; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-  .tabs { display: flex; gap: 6px; padding: 12px 16px 0; overflow-x: auto; scrollbar-width: none; }
+  header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px; position: sticky; top: 0; z-index: 100; }
+  .header-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+  .logo { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -0.02em; }
+  .logo-icon { width: 28px; height: 28px; border-radius: 7px; background: var(--blue-bg); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 15px; }
+  .logo span { color: var(--accent); font-weight: 600; }
+  .header-actions { display: flex; align-items: center; gap: 8px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); cursor: pointer; font-size: 17px; display: flex; align-items: center; justify-content: center; transition: color 0.15s, border-color 0.15s, background 0.15s; }
+  .icon-btn:hover { color: var(--accent); border-color: #bfdbfe; background: var(--blue-bg); }
+  .overall-progress { text-align: right; font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+  .overall-progress .prog-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--green-bg); color: var(--green); font-size: 16px; display: flex; align-items: center; justify-content: center; }
+  .overall-progress strong { display: block; font-size: 20px; color: var(--green); font-weight: 700; line-height: 1.1; }
+  .progress-bar-wrap { background: var(--surface2); border-radius: 6px; height: 6px; overflow: hidden; border: 1px solid var(--border); }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #16a34a); border-radius: 5px; transition: width 0.4s ease; }
+
+  .tabs { display: flex; gap: 6px; padding: 10px 16px 0; overflow-x: auto; scrollbar-width: none; background: var(--bg); }
   .tabs::-webkit-scrollbar { display: none; }
-  .tab { padding: 7px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; white-space: nowrap; transition: all 0.2s; }
-  .tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .tab { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 500; border: 1px solid var(--border); background: var(--surface); color: var(--muted); cursor: pointer; white-space: nowrap; transition: all 0.15s; font-family: inherit; }
+  .tab .tab-ico { font-size: 13px; opacity: 0.7; }
+  .tab.active { color: #fff; border-color: transparent; }
+  .tab.active .tab-ico { opacity: 1; }
+  .tab-all.active { background: #334155; border-color: #334155; }
+  .tab-sec-sd.active { background: #2563eb; }
+  .tab-sec-hld.active { background: #7c3aed; }
+  .tab-sec-lld.active { background: #0d9488; }
+  .tab-sec-dsa.active { background: #ea580c; }
+  .tab-sec-beh.active { background: #db2777; }
+  .tab-sec-con.active { background: #475569; }
+  .tab-custom.active { background: #64748b; }
+  .tab:focus-visible { outline-offset: 2px; }
 
-  main { padding: 14px 16px; }
+  main { padding: 14px 16px; max-width: 720px; margin: 0 auto; }
 
-  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
-  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 8px; text-align: center; }
-  .stat-num { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 600; display: block; margin-bottom: 2px; }
-  .stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 10px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .stat-icon { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 17px; }
+  .stat-icon.done { background: var(--green-bg); color: var(--green); }
+  .stat-icon.progress { background: var(--yellow-bg); color: var(--yellow); }
+  .stat-icon.pending { background: var(--surface2); color: var(--muted); }
+  .stat-num { font-size: 22px; font-weight: 700; display: block; line-height: 1; }
+  .stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
 
-  .search-wrap { position: relative; margin-bottom: 14px; }
-  .search-input { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px 10px 36px; color: var(--text); font-size: 15px; outline: none; transition: border-color 0.2s; font-family: 'Inter', sans-serif; }
-  .search-input:focus { border-color: var(--accent); }
+  .toolbar { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .search-wrap { position: relative; flex: 1; min-width: 160px; }
+  .search-input { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px 10px 38px; color: var(--text); font-size: 15px; outline: none; transition: border-color 0.15s; font-family: inherit; }
+  .search-input:focus { border-color: #93c5fd; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
   .search-input::placeholder { color: var(--muted); }
-  .search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 15px; pointer-events: none; }
+  .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 16px; pointer-events: none; display: flex; }
+  .filter-wrap { position: relative; display: flex; align-items: center; }
+  .filter-wrap .filter-ico { position: absolute; left: 10px; color: var(--muted); font-size: 14px; pointer-events: none; display: flex; }
+  .filter-select { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px 10px 32px; color: var(--text); font-size: 13px; font-family: inherit; cursor: pointer; }
+  .filter-select:focus { border-color: #93c5fd; outline: none; }
 
-  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; margin-top: 18px; }
-  .section-header:first-of-type { margin-top: 0; }
-  .section-title { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
-  .section-count { font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--muted); }
+  .section-block { margin-bottom: 8px; }
+  .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; margin-top: 16px; padding: 8px 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; cursor: pointer; user-select: none; }
+  .section-header:first-child { margin-top: 0; }
+  .section-header.nested { margin-left: 16px; background: var(--surface); border-style: dashed; }
+  .section-icon { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .section-chevron { font-size: 12px; color: var(--muted); width: 14px; flex-shrink: 0; transition: transform 0.2s; display: flex; }
+  .section-header.collapsed .section-chevron { transform: rotate(-90deg); }
+  .section-title { font-size: 13px; font-weight: 600; color: var(--text); flex: 1; min-width: 0; }
+  .section-count { font-size: 11px; color: var(--muted); flex-shrink: 0; background: var(--surface); border: 1px solid var(--border); padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+  .section-actions { display: flex; gap: 2px; flex-shrink: 0; }
+  .section-actions button { background: none; border: none; color: var(--muted); cursor: pointer; padding: 5px 7px; font-size: 14px; border-radius: 6px; display: flex; align-items: center; }
+  .section-actions button:hover { color: var(--accent); background: var(--blue-bg); }
+  .section-body { padding-left: 4px; }
+  .section-body.hidden { display: none; }
 
-  .topic-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 13px 14px; margin-bottom: 7px; position: relative; overflow: hidden; }
-  .topic-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
-  .topic-card.s-pending::before { background: var(--border); }
+  .topic-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 6px; position: relative; overflow: hidden; transition: border-color 0.15s, box-shadow 0.15s; }
+  .topic-card:hover { border-color: #cbd5e1; box-shadow: 0 1px 4px rgba(15,23,42,0.04); }
+  .topic-card.nested { margin-left: 16px; }
+  .topic-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; border-radius: 10px 0 0 10px; }
+  .topic-card.s-pending::before { background: #cbd5e1; }
   .topic-card.s-progress::before { background: var(--yellow); }
   .topic-card.s-done::before { background: var(--green); }
+  .topic-card.p-high { border-color: #fed7aa; }
+  .topic-card.p-high::after { content: ''; position: absolute; right: 0; top: 0; width: 0; height: 0; border-style: solid; border-width: 0 12px 12px 0; border-color: transparent var(--orange) transparent transparent; }
 
   .topic-row { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-  .status-dot { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; border: 1.5px solid var(--border); background: var(--surface2); transition: all 0.2s; }
-  .s-done .status-dot { background: rgba(52,211,153,0.15); border-color: var(--green); }
-  .s-progress .status-dot { background: rgba(251,191,36,0.15); border-color: var(--yellow); }
+  .status-dot { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; border: 1.5px solid var(--border); background: var(--surface2); color: var(--muted); }
+  .s-done .status-dot { background: var(--green-bg); border-color: #bbf7d0; color: var(--green); }
+  .s-progress .status-dot { background: var(--yellow-bg); border-color: #fef08a; color: var(--yellow); }
   .topic-info { flex: 1; min-width: 0; }
-  .topic-name { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+  .topic-name { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 4px; word-break: break-word; }
   .s-done .topic-name { text-decoration: line-through; color: var(--muted); }
-  .topic-meta { font-size: 11px; color: var(--muted); }
-  .status-badge { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; flex-shrink: 0; }
-  .badge-pending { background: var(--surface2); color: var(--muted); }
-  .badge-progress { background: rgba(251,191,36,0.15); color: var(--yellow); }
-  .badge-done { background: rgba(52,211,153,0.15); color: var(--green); }
+  .topic-meta { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+  .meta-chip { display: inline-flex; align-items: center; gap: 3px; font-size: 10px; color: var(--muted); background: var(--surface2); border: 1px solid var(--border); padding: 2px 7px; border-radius: 10px; font-weight: 500; }
+  .meta-chip .ico { font-size: 11px; }
+  .meta-chip.notes { color: #2563eb; background: var(--blue-bg); border-color: #bfdbfe; }
+  .meta-chip.links { color: var(--teal); background: var(--teal-bg); border-color: #99f6e4; }
+  .meta-chip.reviewed { color: var(--green); background: var(--green-bg); border-color: #bbf7d0; }
+  .meta-chip.priority-high { color: var(--orange); background: var(--orange-bg); border-color: #fed7aa; }
+  .status-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; padding: 4px 9px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; flex-shrink: 0; }
+  .status-badge .ico { font-size: 11px; }
+  .badge-pending { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+  .badge-progress { background: var(--yellow-bg); color: #a16207; border: 1px solid #fef08a; }
+  .badge-done { background: var(--green-bg); color: #15803d; border: 1px solid #bbf7d0; }
 
   .topic-notes { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); display: none; }
   .topic-notes.open { display: block; }
-  .notes-input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; color: var(--text); font-size: 13px; resize: none; min-height: 70px; outline: none; font-family: 'Inter', sans-serif; transition: border-color 0.2s; }
-  .notes-input:focus { border-color: var(--accent); }
+  .notes-input { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; color: var(--text); font-size: 13px; resize: vertical; min-height: 72px; outline: none; font-family: inherit; transition: border-color 0.15s; }
+  .notes-input:focus { border-color: #a1a1aa; }
   .notes-input::placeholder { color: var(--muted); }
-  .notes-actions { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
-  .btn { padding: 7px 12px; border-radius: 8px; font-size: 11px; font-weight: 600; border: none; cursor: pointer; transition: opacity 0.2s; font-family: 'Inter', sans-serif; }
+  .field-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin: 10px 0 6px; display: flex; align-items: center; gap: 5px; }
+  .field-label .ico { font-size: 13px; color: var(--accent); }
+  .resource-list { margin-bottom: 8px; }
+  .resource-item { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; padding: 6px 8px; background: var(--teal-bg); border: 1px solid #99f6e4; border-radius: 8px; }
+  .resource-item .ico { color: var(--teal); font-size: 14px; }
+  .resource-item a { color: #0f766e; font-size: 13px; text-decoration: none; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+  .resource-item a:hover { text-decoration: underline; }
+  .resource-item button { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 2px 6px; border-radius: 4px; display: flex; }
+  .resource-item button:hover { color: var(--danger); background: var(--danger-bg); }
+  .resource-add { display: flex; gap: 6px; margin-top: 6px; }
+  .resource-add input { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; color: var(--text); font-size: 13px; font-family: inherit; }
+  .resource-add input:focus { border-color: #a1a1aa; outline: none; }
+  .notes-actions { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; align-items: center; }
+  .btn { display: inline-flex; align-items: center; gap: 5px; padding: 7px 12px; border-radius: 8px; font-size: 11px; font-weight: 600; border: none; cursor: pointer; transition: opacity 0.15s; font-family: inherit; }
+  .btn .ico { font-size: 12px; }
   .btn:active { opacity: 0.7; }
-  .btn-pending { background: var(--surface2); color: var(--muted); }
-  .btn-progress { background: rgba(251,191,36,0.2); color: var(--yellow); }
-  .btn-done { background: rgba(52,211,153,0.2); color: var(--green); }
-  .btn-save { background: var(--accent); color: #fff; margin-left: auto; }
+  .btn-pending { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+  .btn-progress { background: var(--yellow-bg); color: #a16207; border: 1px solid #fef08a; }
+  .btn-done { background: var(--green-bg); color: #15803d; border: 1px solid #bbf7d0; }
+  .btn-save { background: var(--accent); color: #fff; margin-left: auto; border: 1px solid var(--accent); }
+  .btn-danger { background: var(--danger-bg); color: var(--danger); border: 1px solid #fecaca; }
+  .btn-ghost { background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
+  .priority-select { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; color: var(--text); font-size: 12px; font-family: inherit; }
 
-  .add-btn { position: fixed; bottom: 24px; right: 16px; width: 52px; height: 52px; border-radius: 16px; background: var(--accent); color: #fff; font-size: 26px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(108,142,245,0.4); z-index: 200; }
+  .fab-wrap { position: fixed; bottom: 24px; right: 16px; z-index: 200; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+  .fab-menu { display: none; flex-direction: column; gap: 8px; align-items: flex-end; }
+  .fab-menu.open { display: flex; }
+  .fab-action { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 10px; background: var(--surface); border: 1px solid var(--border); color: var(--text); font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; font-family: inherit; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  .fab-action .ico { font-size: 15px; color: var(--accent); }
+  .fab-action:hover { border-color: #bfdbfe; background: var(--blue-bg); }
+  .fab-main { width: 52px; height: 52px; border-radius: 14px; background: var(--accent); color: #fff; font-size: 24px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(37,99,235,0.35); transition: transform 0.2s; }
+  .fab-main.open { transform: rotate(45deg); }
 
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 300; display: flex; align-items: flex-end; padding: 16px; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 300; display: flex; align-items: flex-end; justify-content: center; padding: 16px; }
   .modal-overlay.hidden { display: none; }
-  .modal { background: var(--surface); border-radius: 20px; padding: 22px; width: 100%; border: 1px solid var(--border); }
-  .modal h3 { font-size: 16px; font-weight: 600; margin-bottom: 14px; }
-  .modal-input, .modal-select { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; color: var(--text); font-size: 15px; outline: none; margin-bottom: 10px; font-family: 'Inter', sans-serif; -webkit-appearance: none; }
-  .modal-input:focus, .modal-select:focus { border-color: var(--accent); }
-  .modal-input::placeholder { color: var(--muted); }
+  .modal { background: var(--surface); border-radius: 12px 12px 8px 8px; padding: 22px; width: 100%; max-width: 480px; border: 1px solid var(--border); max-height: 85vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
+  .modal h3 { font-size: 16px; font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+  .modal-sub { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+  .modal-sub a { color: var(--accent); font-weight: 500; }
+  .modal-input, .modal-select, .modal-textarea { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; color: var(--text); font-size: 15px; outline: none; margin-bottom: 10px; font-family: inherit; }
+  .modal-textarea { resize: vertical; min-height: 80px; }
+  .modal-input:focus, .modal-select:focus, .modal-textarea:focus { border-color: #a1a1aa; }
+  .modal-input::placeholder, .modal-textarea::placeholder { color: var(--muted); }
   .modal-btns { display: flex; gap: 10px; margin-top: 6px; }
-  .modal-cancel { background: var(--surface2); color: var(--muted); flex: 1; padding: 13px; font-size: 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: 500; font-family: 'Inter', sans-serif; }
-  .modal-add { background: var(--accent); color: #fff; flex: 1; padding: 13px; font-size: 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-family: 'Inter', sans-serif; }
-  .empty { text-align: center; padding: 50px 20px; color: var(--muted); }
-  .empty-icon { font-size: 36px; margin-bottom: 10px; }
+  .modal-cancel { background: var(--surface2); color: var(--muted); flex: 1; padding: 13px; font-size: 15px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-weight: 500; font-family: inherit; }
+  .modal-add { background: var(--accent); color: #fff; flex: 1; padding: 13px; font-size: 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-family: inherit; }
+  .modal-danger { background: var(--danger-bg); color: var(--danger); border: 1px solid #fecaca; }
+
+  .settings-list { list-style: none; }
+  .settings-list li { margin-bottom: 8px; }
+  .settings-btn { width: 100%; text-align: left; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 14px; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 12px; }
+  .settings-btn:hover { border-color: #bfdbfe; background: var(--blue-bg); }
+  .settings-btn .settings-ico { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+  .settings-btn .settings-ico.export { background: var(--green-bg); color: var(--green); }
+  .settings-btn .settings-ico.import { background: var(--blue-bg); color: var(--accent); }
+  .settings-btn .settings-ico.restore { background: var(--yellow-bg); color: var(--yellow); }
+  .settings-btn small { color: var(--muted); font-size: 11px; display: block; margin-top: 2px; }
+  .settings-btn span.desc { flex: 1; }
+
+  .empty { text-align: center; padding: 48px 20px; color: var(--muted); }
+  .empty-icon { width: 56px; height: 56px; margin: 0 auto 12px; border-radius: 14px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 26px; color: var(--muted); }
+  .empty p { font-size: 14px; margin-bottom: 12px; }
+  .empty button { margin-top: 4px; }
+
+  .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 10px 18px; border-radius: 8px; font-size: 13px; z-index: 400; opacity: 0; transition: opacity 0.3s, transform 0.3s; pointer-events: none; max-width: 90%; text-align: center; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.error { border-color: #fecaca; color: var(--danger); background: #fef2f2; }
+  .toast.success { border-color: #bbf7d0; background: #f0fdf4; }
+
+  .sync-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; padding: 4px 8px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); white-space: nowrap; }
+  .sync-pill .ico { font-size: 11px; }
+  .sync-pill.synced { color: #15803d; background: var(--green-bg); border-color: #bbf7d0; }
+  .sync-pill.syncing { color: #a16207; background: var(--yellow-bg); border-color: #fef08a; }
+  .sync-pill.error { color: var(--danger); background: var(--danger-bg); border-color: #fecaca; }
+  .sync-pill.cloud { color: var(--accent); background: var(--blue-bg); border-color: #bfdbfe; }
+  .auth-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 14px; }
+  .auth-box.signed-in { border-color: #bbf7d0; background: var(--green-bg); }
+  .auth-email { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; word-break: break-all; }
+  .auth-hint { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+  .settings-btn .settings-ico.sync { background: var(--blue-bg); color: var(--accent); }
+  .settings-btn .settings-ico.auth { background: var(--purple-bg); color: var(--purple); }
+
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+  @media (min-width: 600px) {
+    .modal-overlay { align-items: center; }
+    .modal { border-radius: 12px; }
+  }
 </style>
 </head>
 <body>
 
 <header>
   <div class="header-top">
-    <div class="logo">swe<span>.</span>prep</div>
-    <div class="overall-progress">
-      <strong id="pct">0%</strong>done
+    <div class="logo" aria-label="SWE Prep Tracker">
+      <span class="logo-icon" id="logoIcon"></span>
+      swe<span>.</span>prep
+    </div>
+    <div class="header-actions">
+      <span class="sync-pill" id="syncPill" title="Sync status" onclick="openAccount()" style="cursor:pointer" role="button" tabindex="0"></span>
+      <button class="icon-btn" id="accountBtn" onclick="openAccount()" aria-label="Account and sync" title="Account"></button>
+      <button class="icon-btn" id="settingsBtn" onclick="openSettings()" aria-label="Settings and backup" title="Settings"></button>
+      <div class="overall-progress" aria-live="polite">
+        <span class="prog-icon" id="progIcon"></span>
+        <div><strong id="pct">0%</strong>done</div>
+      </div>
     </div>
   </div>
-  <div class="progress-bar-wrap">
+  <div class="progress-bar-wrap" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressWrap">
     <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
   </div>
 </header>
 
-<div class="tabs" id="tabBar"></div>
+<nav class="tabs" id="tabBar" aria-label="Section filters"></nav>
 <main id="mainContent"></main>
 
-<button class="add-btn" onclick="openModal()">+</button>
-
-<div class="modal-overlay hidden" id="modalOverlay">
-  <div class="modal">
-    <h3>Add Topic</h3>
-    <input class="modal-input" id="newName" placeholder="e.g. Design Twitter" />
-    <select class="modal-select" id="newCat">
-      <option>System Design</option>
-      <option>HLD</option>
-      <option>LLD</option>
-      <option>DSA</option>
-      <option>Behavioral</option>
-      <option>Concepts</option>
-    </select>
-    <div class="modal-btns">
-      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
-      <button class="modal-add" onclick="addTopic()">Add</button>
-    </div>
+<div class="fab-wrap">
+  <div class="fab-menu" id="fabMenu" role="menu">
+    <button class="fab-action" role="menuitem" onclick="openTopicModal()"><span class="ico" id="fabTopicIco"></span> Add topic</button>
+    <button class="fab-action" role="menuitem" onclick="openSectionModal()"><span class="ico" id="fabSecIco"></span> Add section</button>
   </div>
+  <button class="fab-main" id="fabMain" onclick="toggleFab()" aria-label="Add item" aria-expanded="false" aria-haspopup="menu"></button>
 </div>
 
+<div class="modal-overlay hidden" id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<input type="file" id="importFile" accept=".json,application/json" class="sr-only" onchange="handleImport(event)">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
 <script>
-var DEFAULTS = [
-  {id:'s1',name:'Design URL Shortener',cat:'System Design',status:'pending',notes:''},
-  {id:'s2',name:'Design Twitter / X Feed',cat:'System Design',status:'pending',notes:''},
-  {id:'s3',name:'Design YouTube',cat:'System Design',status:'pending',notes:''},
-  {id:'s4',name:'Design WhatsApp / Chat System',cat:'System Design',status:'pending',notes:''},
-  {id:'s5',name:'Design Uber / Ride Sharing',cat:'System Design',status:'pending',notes:''},
-  {id:'s6',name:'Design Netflix',cat:'System Design',status:'pending',notes:''},
-  {id:'s7',name:'Design Google Drive / Dropbox',cat:'System Design',status:'pending',notes:''},
-  {id:'s8',name:'Design Rate Limiter',cat:'System Design',status:'pending',notes:''},
-  {id:'s9',name:'Design Search Autocomplete',cat:'System Design',status:'pending',notes:''},
-  {id:'s10',name:'Design Notification System',cat:'System Design',status:'pending',notes:''},
-  {id:'h1',name:'Load Balancing & Consistent Hashing',cat:'HLD',status:'pending',notes:''},
-  {id:'h2',name:'CAP Theorem & PACELC',cat:'HLD',status:'pending',notes:''},
-  {id:'h3',name:'SQL vs NoSQL – when to use what',cat:'HLD',status:'pending',notes:''},
-  {id:'h4',name:'Caching – Redis, Memcached, strategies',cat:'HLD',status:'pending',notes:''},
-  {id:'h5',name:'Message Queues – Kafka, RabbitMQ',cat:'HLD',status:'pending',notes:''},
-  {id:'h6',name:'CDN & Edge Computing',cat:'HLD',status:'pending',notes:''},
-  {id:'h7',name:'Microservices vs Monolith',cat:'HLD',status:'pending',notes:''},
-  {id:'h8',name:'API Design – REST, GraphQL, gRPC',cat:'HLD',status:'pending',notes:''},
-  {id:'h9',name:'Database Sharding & Replication',cat:'HLD',status:'pending',notes:''},
-  {id:'h10',name:'Distributed Transactions & Saga Pattern',cat:'HLD',status:'pending',notes:''},
-  {id:'l1',name:'Design Parking Lot',cat:'LLD',status:'pending',notes:''},
-  {id:'l2',name:'Design Library Management System',cat:'LLD',status:'pending',notes:''},
-  {id:'l3',name:'Design Elevator System',cat:'LLD',status:'pending',notes:''},
-  {id:'l4',name:'Design Chess Game',cat:'LLD',status:'pending',notes:''},
-  {id:'l5',name:'Design ATM Machine',cat:'LLD',status:'pending',notes:''},
-  {id:'l6',name:'Design Food Delivery App',cat:'LLD',status:'pending',notes:''},
-  {id:'l7',name:'SOLID Principles with examples',cat:'LLD',status:'pending',notes:''},
-  {id:'l8',name:'Design Patterns – Singleton, Factory, Observer',cat:'LLD',status:'pending',notes:''},
-  {id:'d1',name:'Arrays & Sliding Window',cat:'DSA',status:'pending',notes:''},
-  {id:'d2',name:'Trees & Binary Search Trees',cat:'DSA',status:'pending',notes:''},
-  {id:'d3',name:'Graphs – BFS, DFS, Dijkstra',cat:'DSA',status:'pending',notes:''},
-  {id:'d4',name:'Dynamic Programming (Top patterns)',cat:'DSA',status:'pending',notes:''},
-  {id:'d5',name:'Heaps & Priority Queues',cat:'DSA',status:'pending',notes:''},
-  {id:'d6',name:'Tries & String Algorithms',cat:'DSA',status:'pending',notes:''},
-  {id:'b1',name:'Leadership & Ownership stories',cat:'Behavioral',status:'pending',notes:''},
-  {id:'b2',name:'Conflict resolution story',cat:'Behavioral',status:'pending',notes:''},
-  {id:'b3',name:'Failure & learning story',cat:'Behavioral',status:'pending',notes:''},
-  {id:'b4',name:'Cross-functional collaboration',cat:'Behavioral',status:'pending',notes:''},
-  {id:'c1',name:'TCP/IP, DNS, HTTP/HTTPS',cat:'Concepts',status:'pending',notes:''},
-  {id:'c2',name:'OSI Model',cat:'Concepts',status:'pending',notes:''},
-  {id:'c3',name:'ACID Properties',cat:'Concepts',status:'pending',notes:''},
-  {id:'c4',name:'Indexing in Databases',cat:'Concepts',status:'pending',notes:''}
+var STORAGE_KEY = 'swePrepV3';
+var BACKUP_KEY = 'swePrepV3_backup';
+var LEGACY_KEY = 'swePrepV2';
+var DATA_VERSION = 3;
+
+var DEFAULT_SECTIONS = [
+  {id:'sec-sd',title:'System Design',order:0,parentId:null,collapsed:false},
+  {id:'sec-hld',title:'HLD',order:1,parentId:null,collapsed:false},
+  {id:'sec-lld',title:'LLD',order:2,parentId:null,collapsed:false},
+  {id:'sec-dsa',title:'DSA',order:3,parentId:null,collapsed:false},
+  {id:'sec-beh',title:'Behavioral',order:4,parentId:null,collapsed:false},
+  {id:'sec-con',title:'Concepts',order:5,parentId:null,collapsed:false}
 ];
 
-var CATS = ['All','System Design','HLD','LLD','DSA','Behavioral','Concepts'];
-var SHORT = {'System Design':'SD','HLD':'HLD','LLD':'LLD','DSA':'DSA','Behavioral':'BEH','Concepts':'OPS'};
-var ICON = {pending:'○',progress:'◐',done:'✓'};
-var LABEL = {pending:'Pending',progress:'In Progress',done:'Done'};
+var CAT_TO_SECTION = {
+  'System Design':'sec-sd','HLD':'sec-hld','LLD':'sec-lld',
+  'DSA':'sec-dsa','Behavioral':'sec-beh','Concepts':'sec-con'
+};
 
-var topics = [];
+var SHORT = {'sec-sd':'SD','sec-hld':'HLD','sec-lld':'LLD','sec-dsa':'DSA','sec-beh':'BEH','sec-con':'OPS','All':'All'};
+var LABEL = {pending:'Pending','in-progress':'In Progress',done:'Done'};
+var PRIORITY_LABEL = {low:'Low',medium:'Medium',high:'High'};
+
+var SEC_THEME = {
+  'sec-sd': { color:'#2563eb', bg:'#eff6ff', icon:'layers' },
+  'sec-hld': { color:'#7c3aed', bg:'#f5f3ff', icon:'network' },
+  'sec-lld': { color:'#0d9488', bg:'#f0fdfa', icon:'box' },
+  'sec-dsa': { color:'#ea580c', bg:'#fff7ed', icon:'code' },
+  'sec-beh': { color:'#db2777', bg:'#fdf2f8', icon:'users' },
+  'sec-con': { color:'#475569', bg:'#f8fafc', icon:'book' }
+};
+var DEFAULT_SEC_THEME = { color:'#64748b', bg:'#f8fafc', icon:'folder' };
+
+var SVG = {
+  circle:'<circle cx="12" cy="12" r="9"/>',
+  check:'<polyline points="20 6 9 17 4 12"/>',
+  half:'<path d="M12 3a9 9 0 0 1 0 18"/><circle cx="12" cy="12" r="9"/>',
+  search:'<circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/>',
+  settings:'<circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>',
+  plus:'<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+  folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+  link:'<path d="M10 13a5 5 0 0 0 7.54.54l2.92-2.92a5 5 0 0 0-7.07-7.07l-1.6 1.6"/><path d="M14 11a5 5 0 0 0-7.54-.54l-2.92 2.92a5 5 0 0 0 7.07 7.07l1.6-1.6"/>',
+  note:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/>',
+  calendar:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+  edit:'<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>',
+  trash:'<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>',
+  download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+  upload:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>',
+  restore:'<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/>',
+  chevron:'<polyline points="6 9 12 15 18 9"/>',
+  filter:'<polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>',
+  flag:'<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>',
+  layers:'<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
+  network:'<rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3M12 12V8"/>',
+  box:'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>',
+  code:'<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>',
+  users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  book:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+  grid:'<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>',
+  save:'<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>',
+  play:'<polygon points="5 3 19 12 5 21 5 3"/>',
+  target:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+  x:'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+  user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  cloud:'<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>',
+  logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>'
+};
+
+function ico(name, size) {
+  var s = size || 16;
+  var path = SVG[name] || SVG.circle;
+  return '<span class="ico"><svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + path + '</svg></span>';
+}
+
+function secTheme(id) { return SEC_THEME[id] || DEFAULT_SEC_THEME; }
+function tabClass(id) {
+  if (id === 'All') return 'tab-all';
+  return SEC_THEME[id] ? 'tab-' + id : 'tab-custom';
+}
+function statusIcon(status) {
+  if (status === 'done') return ico('check', 15);
+  if (status === 'in-progress') return ico('half', 15);
+  return ico('circle', 15);
+}
+
+var DEFAULT_TOPICS = [
+  {id:'s1',sectionId:'sec-sd',name:'Design URL Shortener',status:'pending',notes:'',order:0,priority:'medium',resources:[],lastReviewed:null},
+  {id:'s2',sectionId:'sec-sd',name:'Design Twitter / X Feed',status:'pending',notes:'',order:1,priority:'medium',resources:[],lastReviewed:null},
+  {id:'s3',sectionId:'sec-sd',name:'Design YouTube',status:'pending',notes:'',order:2,priority:'medium',resources:[],lastReviewed:null},
+  {id:'s4',sectionId:'sec-sd',name:'Design WhatsApp / Chat System',status:'pending',notes:'',order:3,priority:'medium',resources:[],lastReviewed:null},
+  {id:'s5',sectionId:'sec-sd',name:'Design Uber / Ride Sharing',status:'pending',notes:'',order:4,priority:'medium',resources:[],lastReviewed:null},
+  {id:'s6',sectionId:'sec-sd',name:'Design Netflix',status:'pending',notes:'',order:5,priority:'medium',resources:[],lastReviewed:null},
+  {id:'s7',sectionId:'sec-sd',name:'Design Google Drive / Dropbox',status:'pending',notes:'',order:6,priority:'medium',resources:[],lastReviewed:null},
+  {id:'s8',sectionId:'sec-sd',name:'Design Rate Limiter',status:'pending',notes:'',order:7,priority:'medium',resources:[],lastReviewed:null},
+  {id:'s9',sectionId:'sec-sd',name:'Design Search Autocomplete',status:'pending',notes:'',order:8,priority:'medium',resources:[],lastReviewed:null},
+  {id:'s10',sectionId:'sec-sd',name:'Design Notification System',status:'pending',notes:'',order:9,priority:'medium',resources:[],lastReviewed:null},
+  {id:'h1',sectionId:'sec-hld',name:'Load Balancing & Consistent Hashing',status:'pending',notes:'',order:0,priority:'medium',resources:[],lastReviewed:null},
+  {id:'h2',sectionId:'sec-hld',name:'CAP Theorem & PACELC',status:'pending',notes:'',order:1,priority:'medium',resources:[],lastReviewed:null},
+  {id:'h3',sectionId:'sec-hld',name:'SQL vs NoSQL – when to use what',status:'pending',notes:'',order:2,priority:'medium',resources:[],lastReviewed:null},
+  {id:'h4',sectionId:'sec-hld',name:'Caching – Redis, Memcached, strategies',status:'pending',notes:'',order:3,priority:'medium',resources:[],lastReviewed:null},
+  {id:'h5',sectionId:'sec-hld',name:'Message Queues – Kafka, RabbitMQ',status:'pending',notes:'',order:4,priority:'medium',resources:[],lastReviewed:null},
+  {id:'h6',sectionId:'sec-hld',name:'CDN & Edge Computing',status:'pending',notes:'',order:5,priority:'medium',resources:[],lastReviewed:null},
+  {id:'h7',sectionId:'sec-hld',name:'Microservices vs Monolith',status:'pending',notes:'',order:6,priority:'medium',resources:[],lastReviewed:null},
+  {id:'h8',sectionId:'sec-hld',name:'API Design – REST, GraphQL, gRPC',status:'pending',notes:'',order:7,priority:'medium',resources:[],lastReviewed:null},
+  {id:'h9',sectionId:'sec-hld',name:'Database Sharding & Replication',status:'pending',notes:'',order:8,priority:'medium',resources:[],lastReviewed:null},
+  {id:'h10',sectionId:'sec-hld',name:'Distributed Transactions & Saga Pattern',status:'pending',notes:'',order:9,priority:'medium',resources:[],lastReviewed:null},
+  {id:'l1',sectionId:'sec-lld',name:'Design Parking Lot',status:'pending',notes:'',order:0,priority:'medium',resources:[],lastReviewed:null},
+  {id:'l2',sectionId:'sec-lld',name:'Design Library Management System',status:'pending',notes:'',order:1,priority:'medium',resources:[],lastReviewed:null},
+  {id:'l3',sectionId:'sec-lld',name:'Design Elevator System',status:'pending',notes:'',order:2,priority:'medium',resources:[],lastReviewed:null},
+  {id:'l4',sectionId:'sec-lld',name:'Design Chess Game',status:'pending',notes:'',order:3,priority:'medium',resources:[],lastReviewed:null},
+  {id:'l5',sectionId:'sec-lld',name:'Design ATM Machine',status:'pending',notes:'',order:4,priority:'medium',resources:[],lastReviewed:null},
+  {id:'l6',sectionId:'sec-lld',name:'Design Food Delivery App',status:'pending',notes:'',order:5,priority:'medium',resources:[],lastReviewed:null},
+  {id:'l7',sectionId:'sec-lld',name:'SOLID Principles with examples',status:'pending',notes:'',order:6,priority:'medium',resources:[],lastReviewed:null},
+  {id:'l8',sectionId:'sec-lld',name:'Design Patterns – Singleton, Factory, Observer',status:'pending',notes:'',order:7,priority:'medium',resources:[],lastReviewed:null},
+  {id:'d1',sectionId:'sec-dsa',name:'Arrays & Sliding Window',status:'pending',notes:'',order:0,priority:'medium',resources:[],lastReviewed:null},
+  {id:'d2',sectionId:'sec-dsa',name:'Trees & Binary Search Trees',status:'pending',notes:'',order:1,priority:'medium',resources:[],lastReviewed:null},
+  {id:'d3',sectionId:'sec-dsa',name:'Graphs – BFS, DFS, Dijkstra',status:'pending',notes:'',order:2,priority:'medium',resources:[],lastReviewed:null},
+  {id:'d4',sectionId:'sec-dsa',name:'Dynamic Programming (Top patterns)',status:'pending',notes:'',order:3,priority:'medium',resources:[],lastReviewed:null},
+  {id:'d5',sectionId:'sec-dsa',name:'Heaps & Priority Queues',status:'pending',notes:'',order:4,priority:'medium',resources:[],lastReviewed:null},
+  {id:'d6',sectionId:'sec-dsa',name:'Tries & String Algorithms',status:'pending',notes:'',order:5,priority:'medium',resources:[],lastReviewed:null},
+  {id:'b1',sectionId:'sec-beh',name:'Leadership & Ownership stories',status:'pending',notes:'',order:0,priority:'medium',resources:[],lastReviewed:null},
+  {id:'b2',sectionId:'sec-beh',name:'Conflict resolution story',status:'pending',notes:'',order:1,priority:'medium',resources:[],lastReviewed:null},
+  {id:'b3',sectionId:'sec-beh',name:'Failure & learning story',status:'pending',notes:'',order:2,priority:'medium',resources:[],lastReviewed:null},
+  {id:'b4',sectionId:'sec-beh',name:'Cross-functional collaboration',status:'pending',notes:'',order:3,priority:'medium',resources:[],lastReviewed:null},
+  {id:'c1',sectionId:'sec-con',name:'TCP/IP, DNS, HTTP/HTTPS',status:'pending',notes:'',order:0,priority:'medium',resources:[],lastReviewed:null},
+  {id:'c2',sectionId:'sec-con',name:'OSI Model',status:'pending',notes:'',order:1,priority:'medium',resources:[],lastReviewed:null},
+  {id:'c3',sectionId:'sec-con',name:'ACID Properties',status:'pending',notes:'',order:2,priority:'medium',resources:[],lastReviewed:null},
+  {id:'c4',sectionId:'sec-con',name:'Indexing in Databases',status:'pending',notes:'',order:3,priority:'medium',resources:[],lastReviewed:null}
+];
+
+var state = { version: DATA_VERSION, sections: [], topics: [] };
 var activeTab = 'All';
+var statusFilter = 'all';
 var openCards = {};
 var searchQ = '';
+var modalMode = null;
+var editingId = null;
+var toastTimer = null;
+
+var sb = null;
+var sbUser = null;
+var SUPABASE_ENABLED = false;
+var syncStatus = 'local';
+var cloudSaveTimer = null;
+var cloudPulling = false;
+
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function clone(obj) { return JSON.parse(JSON.stringify(obj)); }
+
+function getFreshDefaults() {
+  return { version: DATA_VERSION, sections: clone(DEFAULT_SECTIONS), topics: clone(DEFAULT_TOPICS) };
+}
+
+function normalizeTopic(t) {
+  return {
+    id: t.id || ('t' + Date.now()),
+    sectionId: t.sectionId || 'sec-sd',
+    name: t.name || 'Untitled',
+    status: ['pending','in-progress','done'].indexOf(t.status) >= 0 ? t.status : 'pending',
+    notes: t.notes || '',
+    order: typeof t.order === 'number' ? t.order : 0,
+    priority: ['low','medium','high'].indexOf(t.priority) >= 0 ? t.priority : 'medium',
+    resources: Array.isArray(t.resources) ? t.resources : [],
+    lastReviewed: t.lastReviewed || null
+  };
+}
+
+function normalizeSection(s) {
+  return {
+    id: s.id || ('sec' + Date.now()),
+    title: s.title || 'Untitled Section',
+    order: typeof s.order === 'number' ? s.order : 0,
+    parentId: s.parentId || null,
+    collapsed: !!s.collapsed
+  };
+}
+
+function validateState(data) {
+  if (!data || typeof data !== 'object') throw new Error('Invalid data');
+  var sections = Array.isArray(data.sections) ? data.sections.map(normalizeSection) : [];
+  var topics = Array.isArray(data.topics) ? data.topics.map(normalizeTopic) : [];
+  return { version: DATA_VERSION, sections: sections, topics: topics };
+}
+
+function migrateV2(flatTopics) {
+  if (!Array.isArray(flatTopics)) throw new Error('Invalid v2 data');
+  var sectionMap = {};
+  var sections = [];
+  var order = 0;
+
+  flatTopics.forEach(function(t) {
+    var cat = t.cat || 'Other';
+    if (!sectionMap[cat]) {
+      var knownId = CAT_TO_SECTION[cat];
+      var id = knownId || ('sec-' + cat.toLowerCase().replace(/[^a-z0-9]+/g,'-'));
+      sectionMap[cat] = id;
+      if (!knownId || !sections.some(function(s){ return s.id === id; })) {
+        sections.push({ id: id, title: cat, order: order++, parentId: null, collapsed: false });
+      }
+    }
+  });
+
+  var topics = flatTopics.map(function(t, i) {
+    return normalizeTopic({
+      id: t.id,
+      sectionId: sectionMap[t.cat || 'Other'],
+      name: t.name,
+      status: t.status,
+      notes: t.notes,
+      order: i,
+      priority: t.priority || 'medium',
+      resources: t.resources || [],
+      lastReviewed: t.lastReviewed || null
+    });
+  });
+
+  return { version: DATA_VERSION, sections: sections, topics: topics };
+}
+
+function mergeWithDefaults(data) {
+  var result = validateState(data);
+  var secIds = {};
+  result.sections.forEach(function(s) { secIds[s.id] = true; });
+
+  DEFAULT_SECTIONS.forEach(function(ds) {
+    if (!secIds[ds.id]) {
+      result.sections.push(clone(ds));
+      secIds[ds.id] = true;
+    }
+  });
+
+  var topicIds = {};
+  result.topics.forEach(function(t) { topicIds[t.id] = t; });
+
+  DEFAULT_TOPICS.forEach(function(dt) {
+    if (topicIds[dt.id]) {
+      var existing = topicIds[dt.id];
+      if (!existing.sectionId) existing.sectionId = dt.sectionId;
+      if (!existing.priority) existing.priority = dt.priority;
+      if (!existing.resources) existing.resources = [];
+    } else {
+      result.topics.push(clone(dt));
+    }
+  });
+
+  result.sections.sort(function(a,b) { return a.order - b.order; });
+  return result;
+}
 
 function loadData() {
+  var loaded = false;
+
   try {
-    var s = localStorage.getItem('swePrepV2');
-    if (s) { topics = JSON.parse(s); return; }
-  } catch(e) {}
-  topics = JSON.parse(JSON.stringify(DEFAULTS));
+    var raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      state = mergeWithDefaults(validateState(JSON.parse(raw)));
+      loaded = true;
+    }
+  } catch(e) {
+    try {
+      var backup = localStorage.getItem(BACKUP_KEY);
+      if (backup) {
+        state = mergeWithDefaults(validateState(JSON.parse(backup)));
+        showToast('Restored from backup', 'success');
+        loaded = true;
+      }
+    } catch(e2) {}
+  }
+
+  if (!loaded) {
+    try {
+      var legacy = localStorage.getItem(LEGACY_KEY);
+      if (legacy) {
+        var parsed = JSON.parse(legacy);
+        localStorage.setItem(LEGACY_KEY + '_preserved_' + Date.now(), legacy);
+        state = mergeWithDefaults(migrateV2(parsed));
+        saveData();
+        showToast('Migrated your data safely to v3', 'success');
+        loaded = true;
+      }
+    } catch(e) {}
+  }
+
+  if (!loaded) {
+    state = getFreshDefaults();
+  }
+}
+
+function saveDataLocalOnly() {
+  try {
+    var current = localStorage.getItem(STORAGE_KEY);
+    if (current) localStorage.setItem(BACKUP_KEY, current);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch(e) {
+    showToast('Save failed — export your data now', 'error');
+  }
 }
 
 function saveData() {
-  try { localStorage.setItem('swePrepV2', JSON.stringify(topics)); } catch(e) {}
+  saveDataLocalOnly();
+  scheduleCloudSave();
 }
 
-function getFiltered() {
-  var t = topics.slice();
-  if (activeTab !== 'All') t = t.filter(function(x){ return x.cat === activeTab; });
+function scheduleCloudSave() {
+  if (!SUPABASE_ENABLED || !sbUser) return;
+  clearTimeout(cloudSaveTimer);
+  cloudSaveTimer = setTimeout(function() { saveToCloud(); }, 800);
+}
+
+function isSupabaseConfigured() {
+  return window.SUPABASE_URL && window.SUPABASE_ANON_KEY &&
+    window.SUPABASE_URL.indexOf('YOUR_') === -1 &&
+    window.SUPABASE_ANON_KEY.indexOf('YOUR_') === -1;
+}
+
+function initSupabase() {
+  if (!isSupabaseConfigured() || typeof supabase === 'undefined') return false;
+  try {
+    sb = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+    SUPABASE_ENABLED = true;
+    sb.auth.onAuthStateChange(function(event, session) {
+      handleAuthChange(session);
+    });
+    return true;
+  } catch(e) {
+    return false;
+  }
+}
+
+function updateSyncUI() {
+  var pill = document.getElementById('syncPill');
+  if (!pill) return;
+  if (!SUPABASE_ENABLED) {
+    pill.style.display = 'none';
+    return;
+  }
+  pill.style.display = 'inline-flex';
+  var labels = {
+    local: { cls: '', text: 'Local only', icon: 'circle' },
+    signed: { cls: 'cloud', text: 'Sign in', icon: 'cloud' },
+    syncing: { cls: 'syncing', text: 'Syncing…', icon: 'restore' },
+    synced: { cls: 'synced', text: 'Synced', icon: 'check' },
+    error: { cls: 'error', text: 'Sync error', icon: 'x' }
+  };
+  var info = labels[syncStatus] || labels.local;
+  pill.className = 'sync-pill ' + info.cls;
+  pill.innerHTML = ico(info.icon, 11) + ' ' + info.text;
+}
+
+async function saveToCloud() {
+  if (!sb || !sbUser || cloudPulling) return;
+  syncStatus = 'syncing';
+  updateSyncUI();
+  try {
+    var payload = {
+      user_id: sbUser.id,
+      data: state,
+      updated_at: new Date().toISOString()
+    };
+    var res = await sb.from('prep_data').upsert(payload, { onConflict: 'user_id' });
+    if (res.error) throw res.error;
+    syncStatus = 'synced';
+    updateSyncUI();
+  } catch(e) {
+    syncStatus = 'error';
+    updateSyncUI();
+    showToast('Cloud sync failed — data saved locally', 'error');
+  }
+}
+
+async function loadFromCloud() {
+  if (!sb || !sbUser) return;
+  cloudPulling = true;
+  syncStatus = 'syncing';
+  updateSyncUI();
+  var needsUpload = false;
+  try {
+    var res = await sb.from('prep_data').select('data, updated_at').eq('user_id', sbUser.id).maybeSingle();
+    if (res.error) throw res.error;
+
+    if (res.data && res.data.data && res.data.data.topics) {
+      var remote = mergeWithDefaults(validateState(res.data.data));
+      state = mergeStates(state, remote);
+      saveDataLocalOnly();
+      showToast('Synced from cloud', 'success');
+    } else {
+      needsUpload = true;
+    }
+    syncStatus = 'synced';
+  } catch(e) {
+    syncStatus = 'error';
+    showToast('Could not load cloud data — using local copy', 'error');
+  } finally {
+    cloudPulling = false;
+    updateSyncUI();
+    render();
+  }
+  if (needsUpload) {
+    await saveToCloud();
+    showToast('Local data uploaded to cloud', 'success');
+  }
+}
+
+async function manualCloudSync() {
+  if (!sbUser) { openAccount(); return; }
+  cloudPulling = true;
+  try {
+    var res = await sb.from('prep_data').select('data, updated_at').eq('user_id', sbUser.id).maybeSingle();
+    if (res.error) throw res.error;
+    if (res.data && res.data.data) {
+      state = mergeStates(state, mergeWithDefaults(validateState(res.data.data)));
+      saveDataLocalOnly();
+    }
+    cloudPulling = false;
+    await saveToCloud();
+    closeModal();
+    render();
+    showToast('Sync complete', 'success');
+  } catch(e) {
+    cloudPulling = false;
+    showToast('Sync failed', 'error');
+  }
+}
+
+async function handleAuthChange(session) {
+  if (session && session.user) {
+    sbUser = session.user;
+    await loadFromCloud();
+  } else {
+    sbUser = null;
+    syncStatus = SUPABASE_ENABLED ? 'signed' : 'local';
+    updateSyncUI();
+  }
+}
+
+async function signIn() {
+  if (!sb) { showToast('Supabase not configured', 'error'); return; }
+  var email = document.getElementById('authEmail').value.trim();
+  var password = document.getElementById('authPassword').value;
+  if (!email || !password) { showToast('Enter email and password', 'error'); return; }
+  var res = await sb.auth.signInWithPassword({ email: email, password: password });
+  if (res.error) { showToast(res.error.message, 'error'); return; }
+  closeModal();
+  showToast('Signed in', 'success');
+}
+
+async function signUp() {
+  if (!sb) { showToast('Supabase not configured', 'error'); return; }
+  var email = document.getElementById('authEmail').value.trim();
+  var password = document.getElementById('authPassword').value;
+  if (!email || !password) { showToast('Enter email and password', 'error'); return; }
+  if (password.length < 6) { showToast('Password must be at least 6 characters', 'error'); return; }
+  var res = await sb.auth.signUp({ email: email, password: password });
+  if (res.error) { showToast(res.error.message, 'error'); return; }
+  if (res.data.session) {
+    closeModal();
+    showToast('Account created', 'success');
+  } else {
+    showToast('Check your email to confirm, then sign in', 'success');
+  }
+}
+
+async function signOut() {
+  if (!sb) return;
+  await sb.auth.signOut();
+  sbUser = null;
+  syncStatus = 'signed';
+  updateSyncUI();
+  closeModal();
+  showToast('Signed out — local data kept on this device', 'success');
+}
+
+function openAccount() {
+  if (!SUPABASE_ENABLED) {
+    openModal(
+      '<h3 id="modalTitle">' + ico('cloud', 18) + ' Cloud sync</h3>' +
+      '<p class="modal-sub">Add your Supabase URL and anon key in supabase-config.js, then run supabase/schema.sql in the SQL Editor.</p>' +
+      '<div class="modal-btns"><button class="modal-cancel" type="button" onclick="closeModal()" style="flex:1">Close</button></div>',
+      'account'
+    );
+    return;
+  }
+
+  if (sbUser) {
+    openModal(
+      '<h3 id="modalTitle">' + ico('user', 18) + ' Account</h3>' +
+      '<div class="auth-box signed-in">' +
+        '<div class="auth-email">' + esc(sbUser.email || 'Signed in') + '</div>' +
+        '<div class="auth-hint">Your prep data syncs across devices when signed in.</div>' +
+      '</div>' +
+      '<ul class="settings-list">' +
+        '<li><button class="settings-btn" type="button" onclick="manualCloudSync()"><span class="settings-ico sync">' + ico('cloud', 17) + '</span><span class="desc">Sync now<small>Merge cloud and this device</small></span></button></li>' +
+      '</ul>' +
+      '<div class="modal-btns">' +
+        '<button class="modal-cancel modal-danger" type="button" onclick="signOut()">Sign out</button>' +
+        '<button class="modal-cancel" type="button" onclick="closeModal()">Close</button>' +
+      '</div>',
+      'account'
+    );
+    return;
+  }
+
+  openModal(
+    '<h3 id="modalTitle">' + ico('cloud', 18) + ' Sign in to sync</h3>' +
+    '<p class="modal-sub">Sync progress across phones, tablets, and browsers. Local data merges on sign-in.</p>' +
+    '<label class="field-label" for="authEmail">Email</label>' +
+    '<input class="modal-input" id="authEmail" type="email" placeholder="you@example.com" autocomplete="email" />' +
+    '<label class="field-label" for="authPassword">Password</label>' +
+    '<input class="modal-input" id="authPassword" type="password" placeholder="Min. 6 characters" autocomplete="current-password" />' +
+    '<div class="modal-btns">' +
+      '<button class="modal-cancel" type="button" onclick="closeModal()">Cancel</button>' +
+      '<button class="modal-cancel" type="button" onclick="signUp()">Create account</button>' +
+      '<button class="modal-add" type="button" onclick="signIn()">Sign in</button>' +
+    '</div>',
+    'account'
+  );
+}
+
+function showToast(msg, type) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (type ? ' ' + type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { el.className = 'toast'; }, 3000);
+}
+
+function getSection(id) {
+  for (var i = 0; i < state.sections.length; i++) {
+    if (state.sections[i].id === id) return state.sections[i];
+  }
+  return null;
+}
+
+function getSectionTitle(id) {
+  var s = getSection(id);
+  return s ? s.title : 'Unknown';
+}
+
+function getTopSections() {
+  return state.sections.filter(function(s) { return !s.parentId; }).sort(function(a,b) { return a.order - b.order; });
+}
+
+function getChildSections(parentId) {
+  return state.sections.filter(function(s) { return s.parentId === parentId; }).sort(function(a,b) { return a.order - b.order; });
+}
+
+function getTopicsInSection(sectionId) {
+  return state.topics.filter(function(t) { return t.sectionId === sectionId; }).sort(function(a,b) { return a.order - b.order; });
+}
+
+function getAllDescendantSectionIds(sectionId) {
+  var ids = [sectionId];
+  getChildSections(sectionId).forEach(function(child) {
+    ids = ids.concat(getAllDescendantSectionIds(child.id));
+  });
+  return ids;
+}
+
+function getFilteredTopics() {
+  var t = state.topics.slice();
+  if (activeTab !== 'All') {
+    var secIds = getAllDescendantSectionIds(activeTab);
+    t = t.filter(function(x) { return secIds.indexOf(x.sectionId) >= 0; });
+  }
+  if (statusFilter !== 'all') t = t.filter(function(x) { return x.status === statusFilter; });
   if (searchQ) {
     var q = searchQ.toLowerCase();
-    t = t.filter(function(x){ return x.name.toLowerCase().indexOf(q) > -1; });
+    t = t.filter(function(x) {
+      return x.name.toLowerCase().indexOf(q) > -1 ||
+        (x.notes && x.notes.toLowerCase().indexOf(q) > -1) ||
+        getSectionTitle(x.sectionId).toLowerCase().indexOf(q) > -1;
+    });
   }
   return t;
 }
 
+function countProgress(topicList) {
+  var done = topicList.filter(function(x) { return x.status === 'done'; }).length;
+  return { done: done, total: topicList.length };
+}
+
 function updateProgress() {
-  var done = topics.filter(function(x){ return x.status === 'done'; }).length;
-  var pct = topics.length ? Math.round(done / topics.length * 100) : 0;
+  var p = countProgress(state.topics);
+  var pct = p.total ? Math.round(p.done / p.total * 100) : 0;
   document.getElementById('pct').textContent = pct + '%';
   document.getElementById('progressBar').style.width = pct + '%';
+  var wrap = document.getElementById('progressWrap');
+  wrap.setAttribute('aria-valuenow', pct);
+  wrap.setAttribute('aria-label', pct + '% complete');
 }
 
 function renderTabs() {
   var html = '';
-  CATS.forEach(function(cat) {
-    var all = cat === 'All' ? topics : topics.filter(function(x){ return x.cat === cat; });
-    var done = all.filter(function(x){ return x.status === 'done'; }).length;
-    var label = cat === 'All' ? 'All' : SHORT[cat];
-    html += '<button class="tab' + (activeTab === cat ? ' active' : '') + '" onclick="switchTab(\'' + cat + '\')">' + label + ' ' + done + '/' + all.length + '</button>';
+  var allP = countProgress(state.topics);
+  html += '<button class="tab tab-all' + (activeTab === 'All' ? ' active' : '') + '" onclick="switchTab(\'All\')" aria-pressed="' + (activeTab === 'All') + '">' +
+    '<span class="tab-ico">' + ico('grid', 13) + '</span> All ' + allP.done + '/' + allP.total + '</button>';
+
+  getTopSections().forEach(function(sec) {
+    var secIds = getAllDescendantSectionIds(sec.id);
+    var secTopics = state.topics.filter(function(t) { return secIds.indexOf(t.sectionId) >= 0; });
+    var p = countProgress(secTopics);
+    var label = SHORT[sec.id] || sec.title.substring(0, 4).toUpperCase();
+    var th = secTheme(sec.id);
+    html += '<button class="tab ' + tabClass(sec.id) + (activeTab === sec.id ? ' active' : '') + '" onclick="switchTab(\'' + esc(sec.id) + '\')" aria-pressed="' + (activeTab === sec.id) + '" title="' + esc(sec.title) + '">' +
+      '<span class="tab-ico">' + ico(th.icon, 13) + '</span> ' + esc(label) + ' ' + p.done + '/' + p.total + '</button>';
   });
+
   document.getElementById('tabBar').innerHTML = html;
+}
+
+function formatDate(iso) {
+  if (!iso) return '';
+  try {
+    var d = new Date(iso);
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  } catch(e) { return ''; }
+}
+
+function metaHTML(t) {
+  var html = '';
+  var th = secTheme(t.sectionId);
+  html += '<span class="meta-chip" style="color:' + th.color + ';background:' + th.bg + ';border-color:' + th.color + '33">' + ico(th.icon, 11) + ' ' + esc(getSectionTitle(t.sectionId)) + '</span>';
+  if (t.priority === 'high') html += '<span class="meta-chip priority-high">' + ico('flag', 11) + ' High</span>';
+  if (t.notes) html += '<span class="meta-chip notes">' + ico('note', 11) + ' Notes</span>';
+  if (t.resources && t.resources.length) html += '<span class="meta-chip links">' + ico('link', 11) + ' ' + t.resources.length + '</span>';
+  if (t.lastReviewed) html += '<span class="meta-chip reviewed">' + ico('calendar', 11) + ' ' + formatDate(t.lastReviewed) + '</span>';
+  return html;
 }
 
 function cardHTML(t) {
   var sc = t.status === 'in-progress' ? 'progress' : t.status;
+  var cssStatus = sc === 'progress' ? 'progress' : sc;
   var isOpen = openCards[t.id] ? 'open' : '';
-  return '<div class="topic-card s-' + sc + '" id="card-' + t.id + '">' +
-    '<div class="topic-row" onclick="toggleCard(\'' + t.id + '\')">' +
-      '<div class="status-dot">' + (ICON[sc] || '○') + '</div>' +
+  var pClass = t.priority === 'high' ? ' p-high' : '';
+
+  var resourcesHTML = '';
+  if (t.resources && t.resources.length) {
+    resourcesHTML = '<div class="resource-list">';
+    t.resources.forEach(function(r, idx) {
+      var url = esc(r.url || '');
+      var title = esc(r.title || r.url || 'Link');
+      resourcesHTML += '<div class="resource-item">' + ico('link', 14) + '<a href="' + url + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">' + title + '</a><button type="button" aria-label="Remove link" onclick="event.stopPropagation();removeResource(\'' + esc(t.id) + '\',' + idx + ')">' + ico('x', 14) + '</button></div>';
+    });
+    resourcesHTML += '</div>';
+  }
+
+  return '<div class="topic-card s-' + cssStatus + pClass + '" id="card-' + esc(t.id) + '">' +
+    '<div class="topic-row" onclick="toggleCard(\'' + esc(t.id) + '\')" role="button" tabindex="0" aria-expanded="' + !!openCards[t.id] + '" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();toggleCard(\'' + esc(t.id) + '\')}">' +
+      '<div class="status-dot" aria-hidden="true">' + statusIcon(t.status) + '</div>' +
       '<div class="topic-info">' +
-        '<div class="topic-name">' + t.name + '</div>' +
-        '<div class="topic-meta">' + t.cat + (t.notes ? ' · has notes' : '') + '</div>' +
+        '<div class="topic-name">' + esc(t.name) + '</div>' +
+        '<div class="topic-meta">' + metaHTML(t) + '</div>' +
       '</div>' +
-      '<span class="status-badge badge-' + sc + '">' + (LABEL[sc] || 'Pending') + '</span>' +
+      '<span class="status-badge badge-' + cssStatus + '">' + statusIcon(t.status) + ' ' + (LABEL[t.status] || 'Pending') + '</span>' +
     '</div>' +
-    '<div class="topic-notes ' + isOpen + '" id="notes-' + t.id + '">' +
-      '<textarea class="notes-input" id="ta-' + t.id + '" placeholder="Add your notes, key points, resources…" rows="3">' + (t.notes || '') + '</textarea>' +
+    '<div class="topic-notes ' + isOpen + '" id="notes-' + esc(t.id) + '">' +
+      '<label class="field-label" for="ta-' + esc(t.id) + '">' + ico('note', 13) + ' Notes</label>' +
+      '<textarea class="notes-input" id="ta-' + esc(t.id) + '" placeholder="Key points, approach, things to remember…" rows="3">' + esc(t.notes || '') + '</textarea>' +
+      '<span class="field-label">' + ico('link', 13) + ' Resources</span>' +
+      resourcesHTML +
+      '<div class="resource-add">' +
+        '<input type="text" id="res-title-' + esc(t.id) + '" placeholder="Title" aria-label="Resource title">' +
+        '<input type="url" id="res-url-' + esc(t.id) + '" placeholder="https://…" aria-label="Resource URL">' +
+        '<button class="btn btn-ghost" type="button" onclick="addResource(\'' + esc(t.id) + '\')">' + ico('plus', 12) + ' Add</button>' +
+      '</div>' +
       '<div class="notes-actions">' +
-        '<button class="btn btn-pending" onclick="setStatus(\'' + t.id + '\',\'pending\')">Pending</button>' +
-        '<button class="btn btn-progress" onclick="setStatus(\'' + t.id + '\',\'in-progress\')">In Progress</button>' +
-        '<button class="btn btn-done" onclick="setStatus(\'' + t.id + '\',\'done\')">✓ Done</button>' +
-        '<button class="btn btn-save" onclick="saveNotes(\'' + t.id + '\')">Save</button>' +
+        '<select class="priority-select" id="pri-' + esc(t.id) + '" aria-label="Priority" onchange="setPriority(\'' + esc(t.id) + '\',this.value)">' +
+          '<option value="low"' + (t.priority==='low'?' selected':'') + '>Low priority</option>' +
+          '<option value="medium"' + (t.priority==='medium'?' selected':'') + '>Medium priority</option>' +
+          '<option value="high"' + (t.priority==='high'?' selected':'') + '>High priority</option>' +
+        '</select>' +
+        '<button class="btn btn-pending" type="button" onclick="setStatus(\'' + esc(t.id) + '\',\'pending\')">' + ico('circle', 12) + ' Pending</button>' +
+        '<button class="btn btn-progress" type="button" onclick="setStatus(\'' + esc(t.id) + '\',\'in-progress\')">' + ico('play', 12) + ' In Progress</button>' +
+        '<button class="btn btn-done" type="button" onclick="setStatus(\'' + esc(t.id) + '\',\'done\')">' + ico('check', 12) + ' Done</button>' +
+        '<button class="btn btn-ghost" type="button" onclick="openEditTopic(\'' + esc(t.id) + '\')">' + ico('edit', 12) + ' Edit</button>' +
+        '<button class="btn btn-save" type="button" onclick="saveNotes(\'' + esc(t.id) + '\')">' + ico('save', 12) + ' Save</button>' +
       '</div>' +
     '</div>' +
   '</div>';
 }
 
+function renderSectionTree(sectionId, filteredIds, depth) {
+  var sec = getSection(sectionId);
+  if (!sec) return '';
+  depth = depth || 0;
+  var childSecs = getChildSections(sectionId);
+  var topics = getTopicsInSection(sectionId).filter(function(t) { return filteredIds.indexOf(t.id) >= 0; });
+  var childTopics = [];
+  childSecs.forEach(function(cs) {
+    getTopicsInSection(cs.id).forEach(function(t) {
+      if (filteredIds.indexOf(t.id) >= 0) childTopics.push(t.id);
+    });
+  });
+
+  var hasContent = topics.length || childSecs.some(function(cs) {
+    return getFilteredTopicsInSection(cs.id, filteredIds).length > 0;
+  });
+  if (!hasContent && activeTab !== 'All' && activeTab !== sectionId) return '';
+
+  var allInSec = getTopicsInSection(sectionId);
+  childSecs.forEach(function(cs) {
+    getAllDescendantSectionIds(cs.id).forEach(function(id) {
+      if (id !== cs.id) getTopicsInSection(id).forEach(function(t) { allInSec.push(t); });
+    });
+  });
+  var visibleInSec = allInSec.filter(function(t) { return filteredIds.indexOf(t.id) >= 0; });
+  if (!visibleInSec.length && !childSecs.length) return '';
+
+  var p = countProgress(visibleInSec.length ? visibleInSec : allInSec);
+  var collapsed = sec.collapsed ? ' collapsed' : '';
+  var nested = depth > 0 ? ' nested' : '';
+  var bodyHidden = sec.collapsed ? ' hidden' : '';
+  var th = secTheme(sec.id);
+
+  var html = '<div class="section-block">';
+  html += '<div class="section-header' + collapsed + nested + '" data-section-id="' + esc(sec.id) + '" onclick="toggleSection(\'' + esc(sec.id) + '\')" role="button" tabindex="0" aria-expanded="' + !sec.collapsed + '" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();toggleSection(\'' + esc(sec.id) + '\')}">' +
+    '<span class="section-icon" style="background:' + th.bg + ';color:' + th.color + '">' + ico(th.icon, 14) + '</span>' +
+    '<span class="section-chevron" aria-hidden="true">' + ico('chevron', 12) + '</span>' +
+    '<span class="section-title">' + esc(sec.title) + '</span>' +
+    '<span class="section-count">' + p.done + '/' + (visibleInSec.length || allInSec.length) + '</span>' +
+    '<span class="section-actions" onclick="event.stopPropagation()">' +
+      '<button type="button" aria-label="Edit section" onclick="openEditSection(\'' + esc(sec.id) + '\')">' + ico('edit', 14) + '</button>' +
+      '<button type="button" aria-label="Add sub-section" onclick="openSectionModal(\'' + esc(sec.id) + '\')">' + ico('plus', 14) + '</button>' +
+    '</span>' +
+  '</div>';
+  html += '<div class="section-body' + bodyHidden + '" id="secbody-' + esc(sec.id) + '">';
+  topics.forEach(function(t) { html += cardHTML(t); });
+  childSecs.forEach(function(cs) {
+    html += renderSectionTree(cs.id, filteredIds, depth + 1);
+  });
+  html += '</div></div>';
+  return html;
+}
+
+function getFilteredTopicsInSection(sectionId, filteredIds) {
+  var ids = getAllDescendantSectionIds(sectionId);
+  return state.topics.filter(function(t) { return ids.indexOf(t.sectionId) >= 0 && filteredIds.indexOf(t.id) >= 0; });
+}
+
 function renderMain() {
-  var filtered = getFiltered();
+  var filtered = getFilteredTopics();
+  var filteredIds = filtered.map(function(t) { return t.id; });
   var html = '';
 
-  if (activeTab === 'All' && !searchQ) {
-    var done = topics.filter(function(x){ return x.status==='done'; }).length;
-    var prog = topics.filter(function(x){ return x.status==='in-progress'; }).length;
-    var pend = topics.filter(function(x){ return x.status==='pending'; }).length;
-    html += '<div class="stats-grid">' +
-      '<div class="stat-card"><span class="stat-num" style="color:var(--green)">' + done + '</span><span class="stat-label">Done</span></div>' +
-      '<div class="stat-card"><span class="stat-num" style="color:var(--yellow)">' + prog + '</span><span class="stat-label">In Progress</span></div>' +
-      '<div class="stat-card"><span class="stat-num" style="color:var(--muted)">' + pend + '</span><span class="stat-label">Pending</span></div>' +
+  if (activeTab === 'All' && !searchQ && statusFilter === 'all') {
+    var done = state.topics.filter(function(x) { return x.status === 'done'; }).length;
+    var prog = state.topics.filter(function(x) { return x.status === 'in-progress'; }).length;
+    var pend = state.topics.filter(function(x) { return x.status === 'pending'; }).length;
+    html += '<div class="stats-grid" role="group" aria-label="Progress summary">' +
+      '<div class="stat-card"><span class="stat-icon done">' + ico('check', 17) + '</span><span class="stat-num" style="color:var(--green)">' + done + '</span><span class="stat-label">Done</span></div>' +
+      '<div class="stat-card"><span class="stat-icon progress">' + ico('play', 17) + '</span><span class="stat-num" style="color:var(--yellow)">' + prog + '</span><span class="stat-label">In Progress</span></div>' +
+      '<div class="stat-card"><span class="stat-icon pending">' + ico('circle', 17) + '</span><span class="stat-num" style="color:var(--muted)">' + pend + '</span><span class="stat-label">Pending</span></div>' +
     '</div>';
   }
 
-  html += '<div class="search-wrap"><span class="search-icon">🔍</span><input class="search-input" placeholder="Search topics…" value="' + searchQ + '" oninput="onSearch(this.value)"></div>';
+  html += '<div class="toolbar">' +
+    '<div class="search-wrap">' +
+      '<span class="search-icon" aria-hidden="true">' + ico('search', 16) + '</span>' +
+      '<input class="search-input" placeholder="Search topics, notes, sections…" value="' + esc(searchQ) + '" oninput="onSearch(this.value)" aria-label="Search">' +
+    '</div>' +
+    '<div class="filter-wrap">' +
+      '<span class="filter-ico" aria-hidden="true">' + ico('filter', 14) + '</span>' +
+      '<select class="filter-select" onchange="setStatusFilter(this.value)" aria-label="Filter by status">' +
+        '<option value="all"' + (statusFilter==='all'?' selected':'') + '>All status</option>' +
+        '<option value="pending"' + (statusFilter==='pending'?' selected':'') + '>Pending</option>' +
+        '<option value="in-progress"' + (statusFilter==='in-progress'?' selected':'') + '>In progress</option>' +
+        '<option value="done"' + (statusFilter==='done'?' selected':'') + '>Done</option>' +
+      '</select>' +
+    '</div>' +
+  '</div>';
 
   if (!filtered.length) {
-    html += '<div class="empty"><div class="empty-icon">📭</div><p>No topics found</p></div>';
+    html += '<div class="empty"><div class="empty-icon" aria-hidden="true">' + ico('search', 26) + '</div><p>No topics found</p>' +
+      '<button class="btn btn-save" type="button" onclick="openTopicModal()">' + ico('plus', 12) + ' Add a topic</button></div>';
   } else if (activeTab === 'All' && !searchQ) {
-    var cats = [];
-    topics.forEach(function(t){ if(cats.indexOf(t.cat)===-1) cats.push(t.cat); });
-    cats.forEach(function(cat) {
-      var ct = filtered.filter(function(x){ return x.cat===cat; });
-      if (!ct.length) return;
-      var cd = ct.filter(function(x){ return x.status==='done'; }).length;
-      html += '<div class="section-header"><span class="section-title">' + cat + '</span><span class="section-count">' + cd + '/' + ct.length + '</span></div>';
-      ct.forEach(function(t){ html += cardHTML(t); });
+    var roots = getTopSections();
+    roots.forEach(function(sec) {
+      html += renderSectionTree(sec.id, filteredIds, 0);
     });
+    var orphanTopics = filtered.filter(function(t) {
+      var sec = getSection(t.sectionId);
+      return !sec || !state.sections.some(function(s) { return s.id === t.sectionId; });
+    });
+    if (orphanTopics.length) {
+      html += '<div class="section-header" style="cursor:default"><span class="section-icon" style="background:#f8fafc;color:#64748b">' + ico('folder', 14) + '</span><span class="section-title">Uncategorized</span><span class="section-count">' + orphanTopics.length + '</span></div>';
+      orphanTopics.forEach(function(t) { html += cardHTML(t); });
+    }
   } else {
-    var fd = filtered.filter(function(x){ return x.status==='done'; }).length;
-    html += '<div class="section-header"><span class="section-title">' + (activeTab==='All'?'Results':activeTab) + '</span><span class="section-count">' + fd + '/' + filtered.length + '</span></div>';
-    filtered.forEach(function(t){ html += cardHTML(t); });
+    var secIds = activeTab === 'All' ? null : getAllDescendantSectionIds(activeTab);
+    var list = filtered.slice();
+    if (secIds) list = list.filter(function(t) { return secIds.indexOf(t.sectionId) >= 0; });
+    var p = countProgress(list);
+    var headerTitle = activeTab === 'All' ? 'Results' : getSectionTitle(activeTab);
+    var hTh = activeTab === 'All' ? DEFAULT_SEC_THEME : secTheme(activeTab);
+    var hIcon = activeTab === 'All' ? 'search' : hTh.icon;
+    html += '<div class="section-header" style="cursor:default"><span class="section-icon" style="background:' + hTh.bg + ';color:' + hTh.color + '">' + ico(hIcon, 14) + '</span><span class="section-title">' + esc(headerTitle) + '</span><span class="section-count">' + p.done + '/' + p.total + '</span></div>';
+    list.forEach(function(t) { html += cardHTML(t); });
   }
 
   document.getElementById('mainContent').innerHTML = html;
 }
 
+function toggleSection(id) {
+  var sec = getSection(id);
+  if (!sec) return;
+  sec.collapsed = !sec.collapsed;
+  saveData();
+  var header = document.querySelector('.section-header[data-section-id="' + id + '"]');
+  var body = document.getElementById('secbody-' + id);
+  if (header) {
+    header.classList.toggle('collapsed', sec.collapsed);
+    header.setAttribute('aria-expanded', !sec.collapsed);
+  }
+  if (body) body.classList.toggle('hidden', sec.collapsed);
+}
+
 function toggleCard(id) {
   openCards[id] = !openCards[id];
   var el = document.getElementById('notes-' + id);
-  if (el) { if(openCards[id]) el.classList.add('open'); else el.classList.remove('open'); }
+  var row = document.querySelector('#card-' + id + ' .topic-row');
+  if (el) { if (openCards[id]) el.classList.add('open'); else el.classList.remove('open'); }
+  if (row) row.setAttribute('aria-expanded', !!openCards[id]);
+}
+
+function findTopic(id) {
+  for (var i = 0; i < state.topics.length; i++) {
+    if (state.topics[i].id === id) return state.topics[i];
+  }
+  return null;
 }
 
 function setStatus(id, status) {
-  for(var i=0;i<topics.length;i++) {
-    if(topics[i].id===id){ topics[i].status=status; break; }
-  }
-  saveData(); render();
+  var t = findTopic(id);
+  if (!t) return;
+  t.status = status;
+  if (status === 'done') t.lastReviewed = new Date().toISOString();
+  saveData();
+  render();
+}
+
+function setPriority(id, priority) {
+  var t = findTopic(id);
+  if (!t) return;
+  t.priority = priority;
+  saveData();
+}
+
+function addResource(id) {
+  var t = findTopic(id);
+  if (!t) return;
+  var titleEl = document.getElementById('res-title-' + id);
+  var urlEl = document.getElementById('res-url-' + id);
+  var url = urlEl ? urlEl.value.trim() : '';
+  if (!url) { if (urlEl) urlEl.focus(); return; }
+  var title = titleEl ? titleEl.value.trim() : '';
+  if (!title) title = url;
+  if (!t.resources) t.resources = [];
+  t.resources.push({ title: title, url: url });
+  if (titleEl) titleEl.value = '';
+  if (urlEl) urlEl.value = '';
+  saveData();
+  openCards[id] = true;
+  render();
+}
+
+function removeResource(id, idx) {
+  var t = findTopic(id);
+  if (!t || !t.resources) return;
+  t.resources.splice(idx, 1);
+  saveData();
+  openCards[id] = true;
+  render();
 }
 
 function saveNotes(id) {
   var ta = document.getElementById('ta-' + id);
-  for(var i=0;i<topics.length;i++) {
-    if(topics[i].id===id){ if(ta) topics[i].notes=ta.value; break; }
-  }
+  var t = findTopic(id);
+  if (!t) return;
+  if (ta) t.notes = ta.value;
+  var pri = document.getElementById('pri-' + id);
+  if (pri) t.priority = pri.value;
   openCards[id] = false;
-  saveData(); render();
+  saveData();
+  render();
+  showToast('Saved', 'success');
 }
 
-function switchTab(cat) { activeTab = cat; render(); }
+function switchTab(id) { activeTab = id; render(); }
 function onSearch(v) { searchQ = v; renderMain(); }
+function setStatusFilter(v) { statusFilter = v; renderMain(); }
 
-function openModal() { document.getElementById('modalOverlay').classList.remove('hidden'); document.getElementById('newName').focus(); }
-function closeModal() { document.getElementById('modalOverlay').classList.add('hidden'); document.getElementById('newName').value=''; }
+function toggleFab() {
+  var menu = document.getElementById('fabMenu');
+  var btn = document.getElementById('fabMain');
+  var open = menu.classList.toggle('open');
+  btn.classList.toggle('open', open);
+  btn.setAttribute('aria-expanded', open);
+}
+
+function closeFab() {
+  document.getElementById('fabMenu').classList.remove('open');
+  var btn = document.getElementById('fabMain');
+  btn.classList.remove('open');
+  btn.setAttribute('aria-expanded', 'false');
+}
+
+function sectionOptions(selectedId, parentId) {
+  var html = '<option value="">— Top level —</option>';
+  getTopSections().forEach(function(s) {
+    if (s.id === selectedId) return;
+    html += '<option value="' + esc(s.id) + '"' + (parentId === s.id ? ' selected' : '') + '>' + esc(s.title) + '</option>';
+    getChildSections(s.id).forEach(function(c) {
+      if (c.id === selectedId) return;
+      html += '<option value="' + esc(c.id) + '"' + (parentId === c.id ? ' selected' : '') + '>  ↳ ' + esc(c.title) + '</option>';
+    });
+  });
+  return html;
+}
+
+function topicSectionOptions(selectedId) {
+  var html = '';
+  getTopSections().forEach(function(s) {
+    html += '<option value="' + esc(s.id) + '"' + (selectedId === s.id ? ' selected' : '') + '>' + esc(s.title) + '</option>';
+    getChildSections(s.id).forEach(function(c) {
+      html += '<option value="' + esc(c.id) + '"' + (selectedId === c.id ? ' selected' : '') + '>  ↳ ' + esc(c.title) + '</option>';
+    });
+  });
+  return html;
+}
+
+function openModal(html, mode) {
+  modalMode = mode;
+  document.getElementById('modalContent').innerHTML = html;
+  document.getElementById('modalOverlay').classList.remove('hidden');
+  closeFab();
+  var first = document.querySelector('#modalContent input, #modalContent select, #modalContent button');
+  if (first) setTimeout(function() { first.focus(); }, 50);
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.add('hidden');
+  modalMode = null;
+  editingId = null;
+}
+
+function openTopicModal() {
+  var defaultSec = activeTab !== 'All' ? activeTab : (getTopSections()[0] ? getTopSections()[0].id : 'sec-sd');
+  openModal(
+    '<h3 id="modalTitle">Add Topic</h3>' +
+    '<p class="modal-sub">Add a topic under any section</p>' +
+    '<label class="field-label" for="newName">Name</label>' +
+    '<input class="modal-input" id="newName" placeholder="e.g. Design Twitter" />' +
+    '<label class="field-label" for="newSection">Section</label>' +
+    '<select class="modal-select" id="newSection">' + topicSectionOptions(defaultSec) + '</select>' +
+    '<label class="field-label" for="newPriority">Priority</label>' +
+    '<select class="modal-select" id="newPriority"><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option></select>' +
+    '<div class="modal-btns"><button class="modal-cancel" type="button" onclick="closeModal()">Cancel</button><button class="modal-add" type="button" onclick="addTopic()">Add</button></div>',
+    'addTopic'
+  );
+}
+
+function openSectionModal(parentId) {
+  openModal(
+    '<h3 id="modalTitle">Add Section</h3>' +
+    '<p class="modal-sub">Group related topics together</p>' +
+    '<label class="field-label" for="newSecTitle">Title</label>' +
+    '<input class="modal-input" id="newSecTitle" placeholder="e.g. Mock Interviews" />' +
+    '<label class="field-label" for="newSecParent">Parent section (optional)</label>' +
+    '<select class="modal-select" id="newSecParent">' + sectionOptions(null, parentId || null) + '</select>' +
+    '<div class="modal-btns"><button class="modal-cancel" type="button" onclick="closeModal()">Cancel</button><button class="modal-add" type="button" onclick="addSection()">Add</button></div>',
+    'addSection'
+  );
+}
+
+function openEditTopic(id) {
+  var t = findTopic(id);
+  if (!t) return;
+  editingId = id;
+  openModal(
+    '<h3 id="modalTitle">Edit Topic</h3>' +
+    '<label class="field-label" for="editName">Name</label>' +
+    '<input class="modal-input" id="editName" value="' + esc(t.name) + '" />' +
+    '<label class="field-label" for="editSection">Section</label>' +
+    '<select class="modal-select" id="editSection">' + topicSectionOptions(t.sectionId) + '</select>' +
+    '<div class="modal-btns">' +
+      '<button class="modal-cancel" type="button" onclick="closeModal()">Cancel</button>' +
+      '<button class="modal-cancel modal-danger" type="button" onclick="confirmDeleteTopic()">Delete</button>' +
+      '<button class="modal-add" type="button" onclick="saveEditTopic()">Save</button>' +
+    '</div>',
+    'editTopic'
+  );
+}
+
+function openEditSection(id) {
+  var sec = getSection(id);
+  if (!sec) return;
+  editingId = id;
+  var topicCount = getTopicsInSection(id).length;
+  openModal(
+    '<h3 id="modalTitle">Edit Section</h3>' +
+    '<label class="field-label" for="editSecTitle">Title</label>' +
+    '<input class="modal-input" id="editSecTitle" value="' + esc(sec.title) + '" />' +
+    '<label class="field-label" for="editSecParent">Parent section</label>' +
+    '<select class="modal-select" id="editSecParent">' + sectionOptions(id, sec.parentId) + '</select>' +
+    (topicCount ? '<p class="modal-sub">' + topicCount + ' topic(s) in this section</p>' : '') +
+    '<div class="modal-btns">' +
+      '<button class="modal-cancel" type="button" onclick="closeModal()">Cancel</button>' +
+      '<button class="modal-cancel modal-danger" type="button" onclick="confirmDeleteSection()">Delete</button>' +
+      '<button class="modal-add" type="button" onclick="saveEditSection()">Save</button>' +
+    '</div>',
+    'editSection'
+  );
+}
+
+function openSettings() {
+  var cloudLine = SUPABASE_ENABLED
+    ? (sbUser ? 'Signed in as ' + esc(sbUser.email) : 'Not signed in — <a href="#" onclick="event.preventDefault();openAccount()">sign in to sync</a>')
+    : 'Cloud sync: add supabase-config.js to enable';
+  openModal(
+    '<h3 id="modalTitle">' + ico('settings', 18) + ' Settings & Backup</h3>' +
+    '<p class="modal-sub">' + cloudLine + '</p>' +
+    '<ul class="settings-list">' +
+      (SUPABASE_ENABLED ? '<li><button class="settings-btn" type="button" onclick="openAccount()"><span class="settings-ico auth">' + ico('user', 17) + '</span><span class="desc">Account & sync<small>Sign in across devices</small></span></button></li>' : '') +
+      (SUPABASE_ENABLED && sbUser ? '<li><button class="settings-btn" type="button" onclick="manualCloudSync()"><span class="settings-ico sync">' + ico('cloud', 17) + '</span><span class="desc">Sync now<small>Merge cloud and this device</small></span></button></li>' : '') +
+      '<li><button class="settings-btn" type="button" onclick="exportData()"><span class="settings-ico export">' + ico('download', 17) + '</span><span class="desc">Export backup<small>Download JSON file</small></span></button></li>' +
+      '<li><button class="settings-btn" type="button" onclick="triggerImport()"><span class="settings-ico import">' + ico('upload', 17) + '</span><span class="desc">Import backup<small>Restore from JSON file</small></span></button></li>' +
+      '<li><button class="settings-btn" type="button" onclick="restoreFromBackup()"><span class="settings-ico restore">' + ico('restore', 17) + '</span><span class="desc">Restore auto-backup<small>Last save before current</small></span></button></li>' +
+    '</ul>' +
+    '<p class="modal-sub" style="margin-top:12px">' + state.sections.length + ' sections · ' + state.topics.length + ' topics · v' + DATA_VERSION + '</p>' +
+    '<div class="modal-btns"><button class="modal-cancel" type="button" onclick="closeModal()" style="flex:1">Close</button></div>',
+    'settings'
+  );
+}
 
 function addTopic() {
   var name = document.getElementById('newName').value.trim();
   if (!name) { document.getElementById('newName').focus(); return; }
-  var cat = document.getElementById('newCat').value;
-  topics.push({id:'c'+Date.now(), name:name, cat:cat, status:'pending', notes:''});
-  saveData(); closeModal(); render();
+  var sectionId = document.getElementById('newSection').value;
+  var priority = document.getElementById('newPriority').value;
+  var order = getTopicsInSection(sectionId).length;
+  state.topics.push(normalizeTopic({
+    id: 'c' + Date.now(),
+    sectionId: sectionId,
+    name: name,
+    status: 'pending',
+    notes: '',
+    order: order,
+    priority: priority,
+    resources: [],
+    lastReviewed: null
+  }));
+  saveData();
+  closeModal();
+  render();
+  showToast('Topic added', 'success');
 }
+
+function addSection() {
+  var title = document.getElementById('newSecTitle').value.trim();
+  if (!title) { document.getElementById('newSecTitle').focus(); return; }
+  var parentVal = document.getElementById('newSecParent').value;
+  var parentId = parentVal || null;
+  var maxOrder = state.sections.reduce(function(m, s) { return Math.max(m, s.order); }, -1);
+  var sec = normalizeSection({
+    id: 'sec' + Date.now(),
+    title: title,
+    order: maxOrder + 1,
+    parentId: parentId,
+    collapsed: false
+  });
+  state.sections.push(sec);
+  saveData();
+  closeModal();
+  render();
+  showToast('Section added', 'success');
+}
+
+function saveEditTopic() {
+  var t = findTopic(editingId);
+  if (!t) return;
+  var name = document.getElementById('editName').value.trim();
+  if (!name) { document.getElementById('editName').focus(); return; }
+  t.name = name;
+  t.sectionId = document.getElementById('editSection').value;
+  saveData();
+  closeModal();
+  render();
+  showToast('Topic updated', 'success');
+}
+
+function saveEditSection() {
+  var sec = getSection(editingId);
+  if (!sec) return;
+  var title = document.getElementById('editSecTitle').value.trim();
+  if (!title) { document.getElementById('editSecTitle').focus(); return; }
+  var newParent = document.getElementById('editSecParent').value || null;
+  if (newParent === sec.id) { showToast('Section cannot be its own parent', 'error'); return; }
+  sec.title = title;
+  sec.parentId = newParent;
+  saveData();
+  closeModal();
+  render();
+  showToast('Section updated', 'success');
+}
+
+function confirmDeleteTopic() {
+  if (!confirm('Delete this topic? This cannot be undone.')) return;
+  state.topics = state.topics.filter(function(t) { return t.id !== editingId; });
+  delete openCards[editingId];
+  saveData();
+  closeModal();
+  render();
+  showToast('Topic deleted', 'success');
+}
+
+function confirmDeleteSection() {
+  var sec = getSection(editingId);
+  if (!sec) return;
+  var topicsInSec = state.topics.filter(function(t) { return t.sectionId === editingId; });
+  var msg = topicsInSec.length
+    ? 'Delete "' + sec.title + '" and its ' + topicsInSec.length + ' topic(s)? This cannot be undone.'
+    : 'Delete section "' + sec.title + '"?';
+  if (!confirm(msg)) return;
+  var childIds = getChildSections(editingId).map(function(c) { return c.id; });
+  state.sections = state.sections.filter(function(s) {
+    return s.id !== editingId && childIds.indexOf(s.id) < 0;
+  });
+  var removeIds = [editingId].concat(childIds);
+  state.topics = state.topics.filter(function(t) { return removeIds.indexOf(t.sectionId) < 0; });
+  if (activeTab === editingId) activeTab = 'All';
+  saveData();
+  closeModal();
+  render();
+  showToast('Section deleted', 'success');
+}
+
+function exportData() {
+  var blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'swe-prep-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('Backup downloaded', 'success');
+}
+
+function triggerImport() {
+  document.getElementById('importFile').click();
+}
+
+function handleImport(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var parsed = JSON.parse(e.target.result);
+      var imported;
+      if (Array.isArray(parsed)) {
+        imported = mergeWithDefaults(migrateV2(parsed));
+      } else if (parsed.topics || parsed.sections) {
+        imported = mergeWithDefaults(validateState(parsed));
+      } else {
+        throw new Error('Unrecognized format');
+      }
+      if (!confirm('Import will merge with your current data. Topics with same IDs keep your progress. Continue?')) {
+        event.target.value = '';
+        return;
+      }
+      mergeImport(imported);
+      saveData();
+      closeModal();
+      render();
+      showToast('Import successful', 'success');
+    } catch(err) {
+      showToast('Import failed: invalid file', 'error');
+    }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+function mergeTopic(a, b) {
+  var statusRank = { pending: 0, 'in-progress': 1, done: 2 };
+  var priRank = { low: 0, medium: 1, high: 2 };
+  var merged = clone(a);
+  if ((statusRank[b.status] || 0) > (statusRank[a.status] || 0)) merged.status = b.status;
+  if ((b.notes || '').length > (a.notes || '').length) merged.notes = b.notes;
+  var urls = {};
+  (a.resources || []).forEach(function(r) { if (r && r.url) urls[r.url] = r; });
+  (b.resources || []).forEach(function(r) { if (r && r.url) urls[r.url] = r; });
+  merged.resources = Object.keys(urls).map(function(k) { return urls[k]; });
+  if ((priRank[b.priority] || 0) > (priRank[a.priority] || 0)) merged.priority = b.priority;
+  if (b.lastReviewed && (!a.lastReviewed || b.lastReviewed > a.lastReviewed)) merged.lastReviewed = b.lastReviewed;
+  if (b.name && b.name !== 'Untitled' && (!a.name || a.name === 'Untitled')) merged.name = b.name;
+  return merged;
+}
+
+function mergeStates(local, remote) {
+  var result = validateState(clone(local));
+  var secMap = {};
+  result.sections.forEach(function(s) { secMap[s.id] = s; });
+  remote.sections.forEach(function(rs) {
+    if (!secMap[rs.id]) {
+      result.sections.push(clone(rs));
+      secMap[rs.id] = rs;
+    } else if (secMap[rs.id].title === 'Untitled Section' && rs.title) {
+      secMap[rs.id].title = rs.title;
+    }
+  });
+
+  var topicMap = {};
+  result.topics.forEach(function(t) { topicMap[t.id] = t; });
+  remote.topics.forEach(function(rt) {
+    if (!topicMap[rt.id]) result.topics.push(clone(rt));
+    else topicMap[rt.id] = mergeTopic(topicMap[rt.id], rt);
+  });
+
+  return mergeWithDefaults(result);
+}
+
+function mergeImport(imported) {
+  var secIds = {};
+  state.sections.forEach(function(s) { secIds[s.id] = s; });
+  imported.sections.forEach(function(s) {
+    if (secIds[s.id]) {
+      if (!secIds[s.id].title || secIds[s.id].title === 'Untitled Section') secIds[s.id].title = s.title;
+    } else {
+      state.sections.push(s);
+      secIds[s.id] = s;
+    }
+  });
+
+  var topicIds = {};
+  state.topics.forEach(function(t) { topicIds[t.id] = t; });
+  imported.topics.forEach(function(t) {
+    if (topicIds[t.id]) {
+      var existing = topicIds[t.id];
+      if (t.status && existing.status === 'pending') existing.status = t.status;
+    } else {
+      state.topics.push(t);
+    }
+  });
+}
+
+function restoreFromBackup() {
+  try {
+    var backup = localStorage.getItem(BACKUP_KEY);
+    if (!backup) { showToast('No auto-backup found', 'error'); return; }
+    if (!confirm('Restore from the last auto-backup? Current data will be backed up first.')) return;
+    state = mergeWithDefaults(validateState(JSON.parse(backup)));
+    saveData();
+    closeModal();
+    render();
+    showToast('Restored from backup', 'success');
+  } catch(e) {
+    showToast('Backup restore failed', 'error');
+  }
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    if (!document.getElementById('modalOverlay').classList.contains('hidden')) closeModal();
+    else closeFab();
+  }
+});
+
+document.addEventListener('click', function(e) {
+  var fab = document.querySelector('.fab-wrap');
+  if (fab && !fab.contains(e.target)) closeFab();
+});
 
 function render() { updateProgress(); renderTabs(); renderMain(); }
 
-loadData();
-render();
+function initStaticIcons() {
+  var logo = document.getElementById('logoIcon');
+  if (logo) logo.innerHTML = ico('target', 15);
+  var prog = document.getElementById('progIcon');
+  if (prog) prog.innerHTML = ico('check', 16);
+  var account = document.getElementById('accountBtn');
+  if (account) account.innerHTML = ico('user', 17);
+  var settings = document.getElementById('settingsBtn');
+  if (settings) settings.innerHTML = ico('settings', 17);
+  var fab = document.getElementById('fabMain');
+  if (fab) fab.innerHTML = ico('plus', 24);
+  var fabT = document.getElementById('fabTopicIco');
+  if (fabT) fabT.innerHTML = ico('file', 15);
+  var fabS = document.getElementById('fabSecIco');
+  if (fabS) fabS.innerHTML = ico('folder', 15);
+}
+
+async function boot() {
+  loadData();
+  initStaticIcons();
+  if (initSupabase()) {
+    syncStatus = 'signed';
+    updateSyncUI();
+    try {
+      var sessionRes = await sb.auth.getSession();
+      if (sessionRes.data && sessionRes.data.session) {
+        await handleAuthChange(sessionRes.data.session);
+      }
+    } catch(e) {}
+  } else {
+    updateSyncUI();
+  }
+  render();
+}
+
+boot();
 </script>
 </body>
 </html>
