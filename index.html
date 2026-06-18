@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SWE Prep">
+<title>SWE Prep Tracker</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+  :root {
+    --bg: #0f1117; --surface: #1a1d27; --surface2: #222637; --border: #2e3347;
+    --accent: #6c8ef5; --accent2: #a78bfa; --green: #34d399; --yellow: #fbbf24;
+    --red: #f87171; --text: #e2e8f0; --muted: #64748b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 90px; }
+
+  header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 18px 16px 14px; position: sticky; top: 0; z-index: 100; }
+  .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .logo { font-family: 'JetBrains Mono', monospace; font-size: 17px; font-weight: 600; color: var(--accent); }
+  .logo span { color: var(--accent2); }
+  .overall-progress { text-align: right; font-size: 11px; color: var(--muted); }
+  .overall-progress strong { display: block; font-size: 22px; font-family: 'JetBrains Mono', monospace; color: var(--green); font-weight: 600; }
+  .progress-bar-wrap { background: var(--border); border-radius: 4px; height: 5px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 4px; transition: width 0.4s ease; }
+
+  .tabs { display: flex; gap: 6px; padding: 12px 16px 0; overflow-x: auto; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { padding: 7px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+  .tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  main { padding: 14px 16px; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 8px; text-align: center; }
+  .stat-num { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 600; display: block; margin-bottom: 2px; }
+  .stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .search-wrap { position: relative; margin-bottom: 14px; }
+  .search-input { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px 10px 36px; color: var(--text); font-size: 15px; outline: none; transition: border-color 0.2s; font-family: 'Inter', sans-serif; }
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--muted); }
+  .search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 15px; pointer-events: none; }
+
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; margin-top: 18px; }
+  .section-header:first-of-type { margin-top: 0; }
+  .section-title { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+  .section-count { font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--muted); }
+
+  .topic-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 13px 14px; margin-bottom: 7px; position: relative; overflow: hidden; }
+  .topic-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
+  .topic-card.s-pending::before { background: var(--border); }
+  .topic-card.s-progress::before { background: var(--yellow); }
+  .topic-card.s-done::before { background: var(--green); }
+
+  .topic-row { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .status-dot { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; border: 1.5px solid var(--border); background: var(--surface2); transition: all 0.2s; }
+  .s-done .status-dot { background: rgba(52,211,153,0.15); border-color: var(--green); }
+  .s-progress .status-dot { background: rgba(251,191,36,0.15); border-color: var(--yellow); }
+  .topic-info { flex: 1; min-width: 0; }
+  .topic-name { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+  .s-done .topic-name { text-decoration: line-through; color: var(--muted); }
+  .topic-meta { font-size: 11px; color: var(--muted); }
+  .status-badge { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; flex-shrink: 0; }
+  .badge-pending { background: var(--surface2); color: var(--muted); }
+  .badge-progress { background: rgba(251,191,36,0.15); color: var(--yellow); }
+  .badge-done { background: rgba(52,211,153,0.15); color: var(--green); }
+
+  .topic-notes { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); display: none; }
+  .topic-notes.open { display: block; }
+  .notes-input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; color: var(--text); font-size: 13px; resize: none; min-height: 70px; outline: none; font-family: 'Inter', sans-serif; transition: border-color 0.2s; }
+  .notes-input:focus { border-color: var(--accent); }
+  .notes-input::placeholder { color: var(--muted); }
+  .notes-actions { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .btn { padding: 7px 12px; border-radius: 8px; font-size: 11px; font-weight: 600; border: none; cursor: pointer; transition: opacity 0.2s; font-family: 'Inter', sans-serif; }
+  .btn:active { opacity: 0.7; }
+  .btn-pending { background: var(--surface2); color: var(--muted); }
+  .btn-progress { background: rgba(251,191,36,0.2); color: var(--yellow); }
+  .btn-done { background: rgba(52,211,153,0.2); color: var(--green); }
+  .btn-save { background: var(--accent); color: #fff; margin-left: auto; }
+
+  .add-btn { position: fixed; bottom: 24px; right: 16px; width: 52px; height: 52px; border-radius: 16px; background: var(--accent); color: #fff; font-size: 26px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(108,142,245,0.4); z-index: 200; }
+
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 300; display: flex; align-items: flex-end; padding: 16px; }
+  .modal-overlay.hidden { display: none; }
+  .modal { background: var(--surface); border-radius: 20px; padding: 22px; width: 100%; border: 1px solid var(--border); }
+  .modal h3 { font-size: 16px; font-weight: 600; margin-bottom: 14px; }
+  .modal-input, .modal-select { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; color: var(--text); font-size: 15px; outline: none; margin-bottom: 10px; font-family: 'Inter', sans-serif; -webkit-appearance: none; }
+  .modal-input:focus, .modal-select:focus { border-color: var(--accent); }
+  .modal-input::placeholder { color: var(--muted); }
+  .modal-btns { display: flex; gap: 10px; margin-top: 6px; }
+  .modal-cancel { background: var(--surface2); color: var(--muted); flex: 1; padding: 13px; font-size: 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: 500; font-family: 'Inter', sans-serif; }
+  .modal-add { background: var(--accent); color: #fff; flex: 1; padding: 13px; font-size: 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-family: 'Inter', sans-serif; }
+  .empty { text-align: center; padding: 50px 20px; color: var(--muted); }
+  .empty-icon { font-size: 36px; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="logo">swe<span>.</span>prep</div>
+    <div class="overall-progress">
+      <strong id="pct">0%</strong>done
+    </div>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+  </div>
+</header>
+
+<div class="tabs" id="tabBar"></div>
+<main id="mainContent"></main>
+
+<button class="add-btn" onclick="openModal()">+</button>
+
+<div class="modal-overlay hidden" id="modalOverlay">
+  <div class="modal">
+    <h3>Add Topic</h3>
+    <input class="modal-input" id="newName" placeholder="e.g. Design Twitter" />
+    <select class="modal-select" id="newCat">
+      <option>System Design</option>
+      <option>HLD</option>
+      <option>LLD</option>
+      <option>DSA</option>
+      <option>Behavioral</option>
+      <option>Concepts</option>
+    </select>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-add" onclick="addTopic()">Add</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var DEFAULTS = [
+  {id:'s1',name:'Design URL Shortener',cat:'System Design',status:'pending',notes:''},
+  {id:'s2',name:'Design Twitter / X Feed',cat:'System Design',status:'pending',notes:''},
+  {id:'s3',name:'Design YouTube',cat:'System Design',status:'pending',notes:''},
+  {id:'s4',name:'Design WhatsApp / Chat System',cat:'System Design',status:'pending',notes:''},
+  {id:'s5',name:'Design Uber / Ride Sharing',cat:'System Design',status:'pending',notes:''},
+  {id:'s6',name:'Design Netflix',cat:'System Design',status:'pending',notes:''},
+  {id:'s7',name:'Design Google Drive / Dropbox',cat:'System Design',status:'pending',notes:''},
+  {id:'s8',name:'Design Rate Limiter',cat:'System Design',status:'pending',notes:''},
+  {id:'s9',name:'Design Search Autocomplete',cat:'System Design',status:'pending',notes:''},
+  {id:'s10',name:'Design Notification System',cat:'System Design',status:'pending',notes:''},
+  {id:'h1',name:'Load Balancing & Consistent Hashing',cat:'HLD',status:'pending',notes:''},
+  {id:'h2',name:'CAP Theorem & PACELC',cat:'HLD',status:'pending',notes:''},
+  {id:'h3',name:'SQL vs NoSQL – when to use what',cat:'HLD',status:'pending',notes:''},
+  {id:'h4',name:'Caching – Redis, Memcached, strategies',cat:'HLD',status:'pending',notes:''},
+  {id:'h5',name:'Message Queues – Kafka, RabbitMQ',cat:'HLD',status:'pending',notes:''},
+  {id:'h6',name:'CDN & Edge Computing',cat:'HLD',status:'pending',notes:''},
+  {id:'h7',name:'Microservices vs Monolith',cat:'HLD',status:'pending',notes:''},
+  {id:'h8',name:'API Design – REST, GraphQL, gRPC',cat:'HLD',status:'pending',notes:''},
+  {id:'h9',name:'Database Sharding & Replication',cat:'HLD',status:'pending',notes:''},
+  {id:'h10',name:'Distributed Transactions & Saga Pattern',cat:'HLD',status:'pending',notes:''},
+  {id:'l1',name:'Design Parking Lot',cat:'LLD',status:'pending',notes:''},
+  {id:'l2',name:'Design Library Management System',cat:'LLD',status:'pending',notes:''},
+  {id:'l3',name:'Design Elevator System',cat:'LLD',status:'pending',notes:''},
+  {id:'l4',name:'Design Chess Game',cat:'LLD',status:'pending',notes:''},
+  {id:'l5',name:'Design ATM Machine',cat:'LLD',status:'pending',notes:''},
+  {id:'l6',name:'Design Food Delivery App',cat:'LLD',status:'pending',notes:''},
+  {id:'l7',name:'SOLID Principles with examples',cat:'LLD',status:'pending',notes:''},
+  {id:'l8',name:'Design Patterns – Singleton, Factory, Observer',cat:'LLD',status:'pending',notes:''},
+  {id:'d1',name:'Arrays & Sliding Window',cat:'DSA',status:'pending',notes:''},
+  {id:'d2',name:'Trees & Binary Search Trees',cat:'DSA',status:'pending',notes:''},
+  {id:'d3',name:'Graphs – BFS, DFS, Dijkstra',cat:'DSA',status:'pending',notes:''},
+  {id:'d4',name:'Dynamic Programming (Top patterns)',cat:'DSA',status:'pending',notes:''},
+  {id:'d5',name:'Heaps & Priority Queues',cat:'DSA',status:'pending',notes:''},
+  {id:'d6',name:'Tries & String Algorithms',cat:'DSA',status:'pending',notes:''},
+  {id:'b1',name:'Leadership & Ownership stories',cat:'Behavioral',status:'pending',notes:''},
+  {id:'b2',name:'Conflict resolution story',cat:'Behavioral',status:'pending',notes:''},
+  {id:'b3',name:'Failure & learning story',cat:'Behavioral',status:'pending',notes:''},
+  {id:'b4',name:'Cross-functional collaboration',cat:'Behavioral',status:'pending',notes:''},
+  {id:'c1',name:'TCP/IP, DNS, HTTP/HTTPS',cat:'Concepts',status:'pending',notes:''},
+  {id:'c2',name:'OSI Model',cat:'Concepts',status:'pending',notes:''},
+  {id:'c3',name:'ACID Properties',cat:'Concepts',status:'pending',notes:''},
+  {id:'c4',name:'Indexing in Databases',cat:'Concepts',status:'pending',notes:''}
+];
+
+var CATS = ['All','System Design','HLD','LLD','DSA','Behavioral','Concepts'];
+var SHORT = {'System Design':'SD','HLD':'HLD','LLD':'LLD','DSA':'DSA','Behavioral':'BEH','Concepts':'OPS'};
+var ICON = {pending:'○',progress:'◐',done:'✓'};
+var LABEL = {pending:'Pending',progress:'In Progress',done:'Done'};
+
+var topics = [];
+var activeTab = 'All';
+var openCards = {};
+var searchQ = '';
+
+function loadData() {
+  try {
+    var s = localStorage.getItem('swePrepV2');
+    if (s) { topics = JSON.parse(s); return; }
+  } catch(e) {}
+  topics = JSON.parse(JSON.stringify(DEFAULTS));
+}
+
+function saveData() {
+  try { localStorage.setItem('swePrepV2', JSON.stringify(topics)); } catch(e) {}
+}
+
+function getFiltered() {
+  var t = topics.slice();
+  if (activeTab !== 'All') t = t.filter(function(x){ return x.cat === activeTab; });
+  if (searchQ) {
+    var q = searchQ.toLowerCase();
+    t = t.filter(function(x){ return x.name.toLowerCase().indexOf(q) > -1; });
+  }
+  return t;
+}
+
+function updateProgress() {
+  var done = topics.filter(function(x){ return x.status === 'done'; }).length;
+  var pct = topics.length ? Math.round(done / topics.length * 100) : 0;
+  document.getElementById('pct').textContent = pct + '%';
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+
+function renderTabs() {
+  var html = '';
+  CATS.forEach(function(cat) {
+    var all = cat === 'All' ? topics : topics.filter(function(x){ return x.cat === cat; });
+    var done = all.filter(function(x){ return x.status === 'done'; }).length;
+    var label = cat === 'All' ? 'All' : SHORT[cat];
+    html += '<button class="tab' + (activeTab === cat ? ' active' : '') + '" onclick="switchTab(\'' + cat + '\')">' + label + ' ' + done + '/' + all.length + '</button>';
+  });
+  document.getElementById('tabBar').innerHTML = html;
+}
+
+function cardHTML(t) {
+  var sc = t.status === 'in-progress' ? 'progress' : t.status;
+  var isOpen = openCards[t.id] ? 'open' : '';
+  return '<div class="topic-card s-' + sc + '" id="card-' + t.id + '">' +
+    '<div class="topic-row" onclick="toggleCard(\'' + t.id + '\')">' +
+      '<div class="status-dot">' + (ICON[sc] || '○') + '</div>' +
+      '<div class="topic-info">' +
+        '<div class="topic-name">' + t.name + '</div>' +
+        '<div class="topic-meta">' + t.cat + (t.notes ? ' · has notes' : '') + '</div>' +
+      '</div>' +
+      '<span class="status-badge badge-' + sc + '">' + (LABEL[sc] || 'Pending') + '</span>' +
+    '</div>' +
+    '<div class="topic-notes ' + isOpen + '" id="notes-' + t.id + '">' +
+      '<textarea class="notes-input" id="ta-' + t.id + '" placeholder="Add your notes, key points, resources…" rows="3">' + (t.notes || '') + '</textarea>' +
+      '<div class="notes-actions">' +
+        '<button class="btn btn-pending" onclick="setStatus(\'' + t.id + '\',\'pending\')">Pending</button>' +
+        '<button class="btn btn-progress" onclick="setStatus(\'' + t.id + '\',\'in-progress\')">In Progress</button>' +
+        '<button class="btn btn-done" onclick="setStatus(\'' + t.id + '\',\'done\')">✓ Done</button>' +
+        '<button class="btn btn-save" onclick="saveNotes(\'' + t.id + '\')">Save</button>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function renderMain() {
+  var filtered = getFiltered();
+  var html = '';
+
+  if (activeTab === 'All' && !searchQ) {
+    var done = topics.filter(function(x){ return x.status==='done'; }).length;
+    var prog = topics.filter(function(x){ return x.status==='in-progress'; }).length;
+    var pend = topics.filter(function(x){ return x.status==='pending'; }).length;
+    html += '<div class="stats-grid">' +
+      '<div class="stat-card"><span class="stat-num" style="color:var(--green)">' + done + '</span><span class="stat-label">Done</span></div>' +
+      '<div class="stat-card"><span class="stat-num" style="color:var(--yellow)">' + prog + '</span><span class="stat-label">In Progress</span></div>' +
+      '<div class="stat-card"><span class="stat-num" style="color:var(--muted)">' + pend + '</span><span class="stat-label">Pending</span></div>' +
+    '</div>';
+  }
+
+  html += '<div class="search-wrap"><span class="search-icon">🔍</span><input class="search-input" placeholder="Search topics…" value="' + searchQ + '" oninput="onSearch(this.value)"></div>';
+
+  if (!filtered.length) {
+    html += '<div class="empty"><div class="empty-icon">📭</div><p>No topics found</p></div>';
+  } else if (activeTab === 'All' && !searchQ) {
+    var cats = [];
+    topics.forEach(function(t){ if(cats.indexOf(t.cat)===-1) cats.push(t.cat); });
+    cats.forEach(function(cat) {
+      var ct = filtered.filter(function(x){ return x.cat===cat; });
+      if (!ct.length) return;
+      var cd = ct.filter(function(x){ return x.status==='done'; }).length;
+      html += '<div class="section-header"><span class="section-title">' + cat + '</span><span class="section-count">' + cd + '/' + ct.length + '</span></div>';
+      ct.forEach(function(t){ html += cardHTML(t); });
+    });
+  } else {
+    var fd = filtered.filter(function(x){ return x.status==='done'; }).length;
+    html += '<div class="section-header"><span class="section-title">' + (activeTab==='All'?'Results':activeTab) + '</span><span class="section-count">' + fd + '/' + filtered.length + '</span></div>';
+    filtered.forEach(function(t){ html += cardHTML(t); });
+  }
+
+  document.getElementById('mainContent').innerHTML = html;
+}
+
+function toggleCard(id) {
+  openCards[id] = !openCards[id];
+  var el = document.getElementById('notes-' + id);
+  if (el) { if(openCards[id]) el.classList.add('open'); else el.classList.remove('open'); }
+}
+
+function setStatus(id, status) {
+  for(var i=0;i<topics.length;i++) {
+    if(topics[i].id===id){ topics[i].status=status; break; }
+  }
+  saveData(); render();
+}
+
+function saveNotes(id) {
+  var ta = document.getElementById('ta-' + id);
+  for(var i=0;i<topics.length;i++) {
+    if(topics[i].id===id){ if(ta) topics[i].notes=ta.value; break; }
+  }
+  openCards[id] = false;
+  saveData(); render();
+}
+
+function switchTab(cat) { activeTab = cat; render(); }
+function onSearch(v) { searchQ = v; renderMain(); }
+
+function openModal() { document.getElementById('modalOverlay').classList.remove('hidden'); document.getElementById('newName').focus(); }
+function closeModal() { document.getElementById('modalOverlay').classList.add('hidden'); document.getElementById('newName').value=''; }
+
+function addTopic() {
+  var name = document.getElementById('newName').value.trim();
+  if (!name) { document.getElementById('newName').focus(); return; }
+  var cat = document.getElementById('newCat').value;
+  topics.push({id:'c'+Date.now(), name:name, cat:cat, status:'pending', notes:''});
+  saveData(); closeModal(); render();
+}
+
+function render() { updateProgress(); renderTabs(); renderMain(); }
+
+loadData();
+render();
+</script>
+</body>
+</html>
